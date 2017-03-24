@@ -4,14 +4,17 @@
     <center>
       <img src="img/logo.png">
       <h2>Admin Sign-In</h2>
-      <form action="php/login.php">
+      <form action="php/login.php?login=true" method="post" >
         Email:
         <br>
-        <input type="email" name="email">
+        <input type="email" name="uname" id="uname" required>
         <br>
         Password:
         <br>
-        <input type="password" name="password">
+        <input type="password" name="pword" required>
+        <br>
+        Remember me:
+        <input type='checkbox' name='rememberme'>
         <br>
         <br>
         <input type="submit" value="Submit">

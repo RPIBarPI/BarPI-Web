@@ -9,6 +9,7 @@ $defaultdb = "mysql";
 
 function checkPassword($cUsername, $cPassword)
 {
+	echo "TRACE: checking login..<br>";
 	global $fdbName, $fdbLocation, $fdbUsername, $fdbPassword;
 	//TODO: $cPassword=md5($cPassword);
 
@@ -21,12 +22,10 @@ function checkPassword($cUsername, $cPassword)
 
 	// check the connection
 	if ($db->connect_error){
-		echo "BAD! ERROR CONNECTING!";
+		echo "DEBUG: BAD! ERROR CONNECTING TO DB!<br>";
 		die("connection failed: " . $db->connect_error);
 	}
-	else{
-		echo "Connected succcessfully<br>";
-	}
+
 
 
 
@@ -54,6 +53,9 @@ function checkPassword($cUsername, $cPassword)
 	//mysql_close($db);
 
 	mysqli_close($db);
+	if ($returnValue["id"]!=null){
+		echo "TRACE: successfully verified login!<br>";
+	}
 
 	return $returnValue["id"];
 }

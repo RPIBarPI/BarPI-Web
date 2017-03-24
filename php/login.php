@@ -16,12 +16,14 @@ session_start();
 
 	if($loggingIn == "true")
 	{
+		echo "DEBUG: loggingIn==true..<br>";
 		$uname=$_POST["uname"];
+		echo "uname==".$uname."<br>";
 		$pword=$_POST["pword"];
+		echo "pword==".$pword."<br>";
 		$rememberMe=$_POST["rememberme"];
-		if((strlen($uname) < 17) && (strlen($uname) > 0) && (strlen($pword) > 0))
+		if((strlen($uname) < 50) && (strlen($uname) > 1) && (strlen($pword) > 5))
 		{
-
 			$tooShort=false;
 			$tempID=checkPassword($uname, $pword);
 			if($tempID != NULL)
