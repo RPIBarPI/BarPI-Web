@@ -3,48 +3,67 @@ require_once('SQL.php');
 require_once('cookie.php');
 $tooShort=true;
 $passRight=false;
-$loggingIn=$_GET["login"];
+
+//$loggingIn=NULL;
+//if ($_SERVER["REQUEST_METHOD"] == "GET"){
+//	if (isset($_GET["login"])){
+		$loggingIn=$_GET["login"];
+//	}
+//}
 session_start();
-if($_SESSION["id"] == NULL)
-{
-if($loggingIn == "true")
-{
-$uname=$_POST["uname"];
-$pword=$_POST["pword"];
-$rememberMe=$_POST["rememberme"];
-if((strlen($uname) < 17) && (strlen($uname) > 0) && (strlen($pword) > 0))
-{
-$tooShort=false;
-$tempID=checkPassword($uname, $pword);
-if($tempID != NULL)
-{
-$passRight=true;
-$id=$tempID;
-$username=getUserField($id, "username");
-$usergroup=getUserField($id, "usergroup");
-$_SESSION['id']=$id;
-$_SESSION['username']=$username;
-$_SESSION['usergroup']=$usergroup;
-$cookieTime=NULL;
-if($rememberMe == "on") $cookieTime=time()+(60*60*24*365*8);
-setcookie("forums", session_id(), $cookieTime, "/forums/");
-setSeshInfo(session_id(), $_SERVER['REMOTE_ADDR'], $id, $username);
-}
-}
-}
-}
+//if($_SESSION["id"] == NULL)
+//{
+
+	if($loggingIn == "true")
+	{
+		echo "DEBUG: loggingIn==true..<br>";
+		$uname=$_POST["uname"];
+		echo "uname==".$uname."<br>";
+		$pword=$_POST["pword"];
+		echo "pword==".$pword."<br>";
+		$rememberMe=$_POST["rememberme"];
+		if((strlen($uname) < 50) && (strlen($uname) > 1) && (strlen($pword) > 5))
+		{
+			$tooShort=false;
+			$tempID=checkPassword($uname, $pword);
+			if($tempID != NULL)
+			{
+				echo 'credentials verified.. logging in..';
+				$passRight=true;
+				$id=$tempID;
+				$username=getUserField($id, "username");
+				$usergroup=getUserField($id, "usergroup");
+				$_SESSION['id']=$id;
+				$_SESSION['username']=$username;
+				$_SESSION['usergroup']=$usergroup;
+				$cookieTime=NULL;
+				if($rememberMe == "on") $cookieTime=time()+(60*60*24*365*8);
+					setcookie("forums", session_id(), $cookieTime, "/forums/");
+					setSeshInfo(session_id(), $_SERVER['REMOTE_ADDR'], $id, $username);
+			}
+		}
+	}
+
+// }
+
+
+/*
 require_once('session.php');
+*/
+
 ?>
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-<?php require_once('meta.php'); ?>
-<link rel="icon" type="image/png" href="style/favicon.png">
-<link href="style/style.css" rel="stylesheet" type="text/css">
-<title>Robot Universe Forums | Login</title>
+
+
+
+
+<!--<link href="style/style.css" rel="stylesheet" type="text/css"> -->
+<title>BarPI | Login</title>
 </head>
 <body>
-<?php include("header.php");
+<?php //include("header.php");
 if($loggingIn == "true")
 {
 if($tooShort == false)
