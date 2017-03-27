@@ -1,24 +1,28 @@
 <?php
 
-$servername = "localhost";
-$username = "root";
-$password = "";
+$servername = "67.240.52.147"; //"localhost";
+$username = "barpi"; //"root";
+$password = "MySQL146"; //"";
 $defaultdb = "mysql";
+$port = 5941;
 
 
 
 function checkPassword($cUsername, $cPassword)
 {
 	echo "TRACE: checking login..<br>";
+	echo "DEBUG: HERE .01 <br>";
 	global $fdbName, $fdbLocation, $fdbUsername, $fdbPassword;
 	//TODO: $cPassword=md5($cPassword);
 
 	//$db=mysql_connect($fdbLocation, $fdbUsername, $fdbPassword);
 	//mysql_select_db($fdbName, $db);
 
+	echo "DEBUG: HERE 0.1 <br>";
+
 	// create connect
-	global $servername, $username, $password, $defaultdb;
-	$db = new mysqli($servername, $username, $password, $defaultdb);
+	global $servername, $username, $password, $defaultdb, $port;
+	$db = mysqli_connect($servername, $username, $password, $defaultdb, $port);
 
 	// check the connection
 	if ($db->connect_error){
@@ -27,7 +31,7 @@ function checkPassword($cUsername, $cPassword)
 	}
 
 
-
+	echo "DEBUG: HERE 1 <br>";
 
 	//$query=sprintf("SELECT id FROM users WHERE username='%s' AND password='%s'", mysql_real_escape_string($cUsername), mysql_real_escape_string($cPassword));
 	//	$result=mysql_query($query);
@@ -36,6 +40,7 @@ function checkPassword($cUsername, $cPassword)
 	$result = $db->query($sql);
 
 
+	echo "DEBUG: HERE 2 <br>";
 
 	// if ($result->num_rows > 0) {
 	//     // output data of each row
@@ -46,6 +51,8 @@ function checkPassword($cUsername, $cPassword)
 	//     echo "0 results";
 	// }
 
+	echo "DEBUG: HERE 3 <br>";
+
 	$returnValue = $result->fetch_assoc();
 
 	//$returnValue=mysql_fetch_assoc($result);
@@ -55,6 +62,9 @@ function checkPassword($cUsername, $cPassword)
 	mysqli_close($db);
 	if ($returnValue["id"]!=null){
 		echo "TRACE: successfully verified login!<br>";
+	}
+	else {
+		echo "TRACE: user not found in db<br>";
 	}
 
 	return $returnValue["id"];
