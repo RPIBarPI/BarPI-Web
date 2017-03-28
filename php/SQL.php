@@ -3,7 +3,7 @@
 $servername = "67.240.52.147"; //"localhost";
 $username = "barpi"; //"root";
 $password = "MySQL146"; //"";
-$defaultdb = "mysql";
+$defaultdb = "medius_barpi";
 $port = 5941;
 
 
