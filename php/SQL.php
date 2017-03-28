@@ -36,7 +36,7 @@ function checkPassword($cUsername, $cPassword)
 	//$query=sprintf("SELECT id FROM users WHERE username='%s' AND password='%s'", mysql_real_escape_string($cUsername), mysql_real_escape_string($cPassword));
 	//	$result=mysql_query($query);
 
-	$sql = "SELECT id, username, pw FROM test WHERE username='$cUsername' AND pw='$cPassword'";
+	$sql = "SELECT id, username, password FROM bars WHERE username='$cUsername' AND password='$cPassword'";
 	$result = $db->query($sql);
 
 
