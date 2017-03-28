@@ -13,8 +13,9 @@ function checkPassword($cUsername, $cPassword)
 	echo "TRACE: checking login..<br>";
 	echo "DEBUG: HERE .01 <br>";
 	global $fdbName, $fdbLocation, $fdbUsername, $fdbPassword;
-	//TODO: $cPassword=md5($cPassword);
+	$cPassword=md5($cPassword);
 
+	echo "md5 pw:$cPassword<br>";
 	//$db=mysql_connect($fdbLocation, $fdbUsername, $fdbPassword);
 	//mysql_select_db($fdbName, $db);
 
@@ -33,8 +34,6 @@ function checkPassword($cUsername, $cPassword)
 
 	echo "DEBUG: HERE 1 <br>";
 
-	//$query=sprintf("SELECT id FROM users WHERE username='%s' AND password='%s'", mysql_real_escape_string($cUsername), mysql_real_escape_string($cPassword));
-	//	$result=mysql_query($query);
 
 	$sql = "SELECT id, username, password FROM bars WHERE username='$cUsername' AND password='$cPassword'";
 	$result = $db->query($sql);
@@ -42,14 +41,6 @@ function checkPassword($cUsername, $cPassword)
 
 	echo "DEBUG: HERE 2 <br>";
 
-	// if ($result->num_rows > 0) {
-	//     // output data of each row
-	//     while($row = $result->fetch_assoc()) {
-	//         echo "id: " . $row["id"]. " - uName: " . $row["username"]. " pw: " . $row["pw"]. "<br>";
-	//     }
-	// } else {
-	//     echo "0 results";
-	// }
 
 	echo "DEBUG: HERE 3 <br>";
 

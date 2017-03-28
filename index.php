@@ -11,13 +11,20 @@ session_start();
 //if($_SESSION["id"] == NULL)
 //{
 
+function testInput($data) {
+  $data = trim($data);
+  $data = stripslashes($data);
+  $data = htmlspecialchars($data);
+  return $data;
+}
+
 if($loggingIn == "true")
 {
   echo "DEBUG: loggingIn==true..<br>";
-  $uname=$_POST["uname"];
+  $uname=testInput($_POST["uname"]);
   echo "uname==".$uname."<br>";
-  $pword=$_POST["pword"];
-  echo "pword==".$pword."<br>";
+  $pword=testInput($_POST["pword"]);
+  echo "P:$pword";
   $rememberMe=$_POST["rememberme"];
   if((strlen($uname) < 50) && (strlen($uname) > 1) && (strlen($pword) > 5))
   {
