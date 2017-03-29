@@ -25,6 +25,12 @@ function checkPassword($cUsername, $cPassword)
 	global $servername, $username, $password, $defaultdb, $port;
 	$db = mysqli_connect($servername, $username, $password, $defaultdb, $port);
 
+	if (mysqli_connect_errno()) {
+		echo "Failed to connect to MySQL: " . mysql_connect_error();
+	}
+
+	echo 'DEBUG: HERE 0.2 <br>';
+
 	// check the connection
 	if ($db->connect_error){
 		echo "DEBUG: BAD! ERROR CONNECTING TO DB!<br>";
