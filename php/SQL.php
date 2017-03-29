@@ -23,6 +23,9 @@ function checkPassword($cUsername, $cPassword)
 
 	// create connect
 	global $servername, $username, $password, $defaultdb, $port;
+
+	echo "DEBUG: HERE 0.15 <br>";
+
 	$db = mysqli_connect($servername, $username, $password, $defaultdb, $port);
 
 	if (mysqli_connect_errno()) {
