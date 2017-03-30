@@ -3,8 +3,8 @@
   require_once('cookie.php');
   require_once('session.php');
 
-  $id = 1; // TODO: get this from the login page
-  $db = mysqli_connect($servername, $username, $password, $defaultdb, $port);
+  $id = $_SESSION["id"]; // get this from the login page
+  $db = mysqli_connect($servername, $DB_username, $DB_password, $defaultdb, $port);
   $query = 'SELECT * FROM bars WHERE id='. $id . ';';
   $result = $db->query($query);
   if ($result->num_rows == 1) {
@@ -23,7 +23,7 @@
       $address = $aptno . ' ' . $street . ', ' . $city . ', ' . $state . ' ' . $zip . ' ' . $country;
 
       if (isset($_POST['update'])) {
-        $db = mysqli_connect($servername, $username, $password, $defaultdb, $port);
+        $db = mysqli_connect($servername, $DB_username, $DB_password, $defaultdb, $port);
         $newName = $_POST['barName'];
         $query = 'UPDATE bars SET name=\'' . mysqli_real_escape_string($db, $newName) . '\' WHERE id=\'' . $id . '\';';
         $result = $db->query($query);

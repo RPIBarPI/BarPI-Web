@@ -1,8 +1,8 @@
 <?php
 
-$servername = "67.240.52.147"; //"localhost";
-$username = "barpi"; //"root";
-$password = "MySQL146"; //"";
+$servername = "seanwaclawik.com"; //"67.240.52.147"; //"localhost";
+$DB_username = "barpi"; //"root";
+$DB_password = "MySQL146"; //"";
 $defaultdb = "medius_barpi";
 $port = 5941;
 
@@ -17,10 +17,10 @@ function checkPassword($cUsername, $cPassword)
 
 
 	// create connect
-	global $servername, $username, $password, $defaultdb, $port;
+	global $servername, $DB_username, $DB_password, $defaultdb, $port;
 
 
-	$db = mysqli_connect($servername, $username, $password, $defaultdb, $port);
+	$db = mysqli_connect($servername, $DB_username, $DB_password, $defaultdb, $port);
 	if (mysqli_connect_errno()) {
 		echo "Failed to connect to MySQL: " . mysql_connect_error();
 	}
@@ -75,10 +75,10 @@ function deleteOldSesh($sesh)
 }
 function setSeshInfo($sesh, $sip, $barid)
 {
-	global $servername, $username, $password, $defaultdb, $port;
+	global $servername, $DB_username, $DB_password, $defaultdb, $port;
 	
 
-	$db = mysqli_connect($servername, $username, $password, $defaultdb, $port);
+	$db = mysqli_connect($servername, $DB_username, $DB_password, $defaultdb, $port);
 
 	if (mysqli_connect_errno()) {
 		echo "Failed to connect to MySQL: " . mysql_connect_error();
