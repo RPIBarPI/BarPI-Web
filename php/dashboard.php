@@ -3,7 +3,7 @@
   require_once('cookie.php');
   require_once('session.php');
 
-  $id = $_SESSION["id"]; // get this from the login page
+  $id = $_SESSION["id"]; // get barid from the login page
   $db = mysqli_connect($servername, $DB_username, $DB_password, $defaultdb, $port);
   $query = 'SELECT * FROM bars WHERE id='. $id . ';';
   $result = $db->query($query);
@@ -55,21 +55,57 @@
       // TODO: finish and test this
       // TODO: get drink id from the selected drink
       // TODO: convert the inputted price to a float
+
+      // TODO: need to set latest drink to be the official 'special'
       if (isSet($_POST['add'])) {
-        $isSpecial = 0;
-        if ($_POST['isSpecial'] === 'on') $isSpecial = 1;
         $price = $_POST['price'];
         if ($price[0] == '$') {
           $price = substr($price, 1);
         }
-        $query = 'INSERT INTO event (barid, name, description, drinkid, price, special) ' .
-                    'VALUES (\'' . mysqli_real_escape_string($db, $id) . '\', \'' .
-                    mysqli_real_escape_string($db, $_POST['name']) . '\', \'' .
-                    mysqli_real_escape_string($db, $_POST['description']) . '\', \'' .
-                    mysqli_real_escape_string($db, $_POST['drink'].id) .  '\', \'' .
-                    mysqli_real_escape_string($db, $price) . '\', \'' .
-                    $isSpecial . '\');';
-        $result = $db->query($query);
+
+        $isSpecial = 0;
+        if ($_POST['isSpecial'] === 'on') 
+        $isSpecial = 1;
+
+        if ($isSpecial==1){
+          // insert a drink
+          //    $query = 'INSERT INTO drink (id, name, description, price, barid) '.
+          //    ' VALUES (null, '.
+
+          //    \''mysqli_real_escape_string($db, $_POST['name'])'\', '.
+          //    '  \'H-O2\', \'0\', \'1002\')
+
+          $query = 'INSERT INTO drink (id, name, description, price, barid) ' .
+            'VALUES (null, \'' .
+             
+
+            mysqli_real_escape_string($db, $_POST['name']) . '\', \'' .
+            mysqli_real_escape_string($db, $_POST['description']) . '\', \'' .
+            mysqli_real_escape_string($db, $price) . '\', \'' .
+            mysqli_real_escape_string($db, $id) . 
+            '\');'
+          ;
+          
+          if ($result = $db->query($query) === TRUE){
+            echo "TRACE: Tried query:$query<br>\tsuccessfully inserted special/drink!, return value: $result!<br>";
+          }
+          else {
+            echo "TRACE: special/drink not saved in db :(<br>Tried query:$query<br>";
+          }
+
+        }
+        else {
+          // insert an event
+          $query = 'INSERT INTO event (barid, name, description, drinkid, price, special) ' .
+                      'VALUES (\'' . mysqli_real_escape_string($db, $id) . '\', \'' .
+                      mysqli_real_escape_string($db, $_POST['name']) . '\', \'' .
+                      mysqli_real_escape_string($db, $_POST['description']) . '\', \'' .
+                      mysqli_real_escape_string($db, $_POST['drink'].id) .  '\', \'' .
+                      mysqli_real_escape_string($db, $price) . '\', \'' .
+                      $isSpecial . '\');';
+          
+          $result = $db->query($query);
+        }
       }
 
       echo '<form method=\'POST\' action=\'dashboard.php\'>' .
@@ -90,7 +126,7 @@
       $drinks = array();
       $query = 'SELECT * FROM drink WHERE barid=' . $id;
       $result = $db->query($query);
-      if ($result->num_rows > 1) {
+      if ($result->num_rows >= 1) {
         while ($row = $result->fetch_assoc()) {
           array_push($drinks, $row);
         }
@@ -99,15 +135,21 @@
       echo '<hr><form method=\'POST\' action=\'dashboard.php\'>' .
             '<h4>Create event/special</h4>' .
             '<input type=\'checkbox\' name=\'isSpecial\'>Special (if left unchecked, this will be registered as an event)' .
-            '<br><br>Name of event/special: <input type=\'text\' name=\'name\' required>' .
-            '<br><br>Description: <input type=\'text\' name=\'description\' size=\'80\' required>' .
-            '<br><br>Drink: <select name=\'drinks\' required>';
-
+            
+            '<br><br>Pre-existing Drink: <select name=\'drinks\' > <br><br>';
+            
       foreach($drinks as $d) {
         echo '<option value=\'' . $d['name'] . '\'>' . $d['name'] . '</option>';
       }
-
       echo '</select>';
+      
+
+      echo  '<br><br>Name of event/special: <input type=\'text\' name=\'name\' required>' .
+            '<br><br>Description: <input type=\'text\' name=\'description\' size=\'80\' required>';       ;
+
+      
+
+
       echo '<br><br>Price: <input type=\'text\' name=\'price\' required>';
       echo '<br><br><input type=\'submit\' value=\'Add Event/Special\' name=\'add\'>';
       echo '</form>';
