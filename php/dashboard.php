@@ -26,9 +26,6 @@
         $newName = $_POST['barName'];
         $query = 'UPDATE bars SET name=\'' . mysqli_real_escape_string($db, $newName) . '\' WHERE id=\'' . $id . '\';';
         $result = $db->query($query);
-        if (!$result) {
-          echo $db->error;
-        }
         $barName = $newName;
         $newAptno = $_POST['aptno'];
         $newStreet = $_POST['street'];
@@ -44,7 +41,6 @@
                   mysqli_real_escape_string($db, $newZip) . '\', country=\'' .
                   mysqli_real_escape_string($db, $newCountry) . '\' WHERE barid=' .
                   $id;
-        echo 'QUERY: ' . $query . '<br>';
         $result = $db->query($query);
         $aptno = $newAptNo;
         $street = $newStreet;
@@ -61,13 +57,17 @@
       if (isSet($_POST['add'])) {
         $isSpecial = 0;
         if ($_POST['isSpecial'] === 'on') $isSpecial = 1;
+        $price = $_POST['price'];
+        if ($price[0] == '$') {
+          $price = substr($price, 1);
+        }
         $query = 'INSERT INTO event (barid, name, description, drinkid, price, special) ' .
-                    'VALUES (' . mysqli_real_escape_string($db, $id) . ', ' .
-                    mysqli_real_escape_string($db, $_POST['name']) . ', ' .
-                    mysqli_real_escape_string($db, $_POST['description']) . ', ' .
-                    mysqli_real_escape_string($db, $_POST['drink'].id) .  ', ' .
-                    mysqli_real_escape_string($db, $_POST['price']) . ', ' .
-                    $isSpecial . ');';
+                    'VALUES (\'' . mysqli_real_escape_string($db, $id) . '\', \'' .
+                    mysqli_real_escape_string($db, $_POST['name']) . '\', \'' .
+                    mysqli_real_escape_string($db, $_POST['description']) . '\', \'' .
+                    mysqli_real_escape_string($db, $_POST['drink'].id) .  '\', \'' .
+                    mysqli_real_escape_string($db, $price) . '\', \'' .
+                    $isSpecial . '\');';
         $result = $db->query($query);
       }
 
@@ -86,11 +86,14 @@
             '<br><br><input type=\'submit\' value=\'Update\' name=\'update\'>' .
            '</form>';
 
+      $drinks = array();
       $query = 'SELECT * FROM drink WHERE barid=' . $id;
-      //TODO: test and make sure the result is in the correct format
-      //$drinks = mysqli_query($query);
-      // NOTE: for now, just use a sample list
-      $drinks = array("White Russian", "Lucky 7", "Blue Moon Pitcher");
+      $result = $db->query($query);
+      if ($result->num_rows > 1) {
+        while ($row = $result->fetch_assoc()) {
+          array_push($drinks, $row);
+        }
+      }
 
       echo '<hr><form method=\'POST\' action=\'dashboard.php\'>' .
             '<h4>Create event/special</h4>' .
@@ -100,7 +103,7 @@
             '<br><br>Drink: <select name=\'drinks\' required>';
 
       foreach($drinks as $d) {
-        echo '<option value=\'' . $d . '\'>' . $d . '</option>';
+        echo '<option value=\'' . $d['name'] . '\'>' . $d['name'] . '</option>';
       }
 
       echo '</select>';
