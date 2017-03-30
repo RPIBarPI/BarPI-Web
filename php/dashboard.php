@@ -1,6 +1,7 @@
 <?php
   require_once('SQL.php');
   require_once('cookie.php');
+  require_once('session.php');
 
   $id = 1; // TODO: get this from the DB
   $barName = 'BAR NAME'; //TODO: get this from the DB

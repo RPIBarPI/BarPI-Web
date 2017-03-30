@@ -8,52 +8,55 @@ $passRight=false;
 $loggingIn=$_GET["login"];
 
 session_start();
-//if($_SESSION["id"] == NULL)
-//{
-
-function testInput($data) {
-  $data = trim($data);
-  $data = stripslashes($data);
-  $data = htmlspecialchars($data);
-  return $data;
-}
-
-if($loggingIn == "true")
+if($_SESSION["id"] == NULL)
 {
-  echo "DEBUG: loggingIn==true..<br>";
-  $uname=testInput($_POST["uname"]);
-  echo "uname==".$uname."<br>";
-  $pword=testInput($_POST["pword"]);
-  echo "P:$pword";
-  $rememberMe=$_POST["rememberme"];
-  if((strlen($uname) < 50) && (strlen($uname) > 1) && (strlen($pword) > 5))
+
+  function testInput($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
+  }
+
+  if($loggingIn == "true")
   {
-    $tooShort=false;
-    $tempID=checkPassword($uname, $pword);
-    if($tempID != NULL)
+    echo "DEBUG: loggingIn==true..<br>";
+    $uname=testInput($_POST["uname"]);
+    echo "uname==".$uname."<br>";
+    $pword=testInput($_POST["pword"]);
+    echo "P:$pword";
+    $rememberMe=$_POST["rememberme"];
+    if((strlen($uname) < 50) && (strlen($uname) > 1) && (strlen($pword) > 5))
     {
-      echo 'credentials verified.. logging in..';
-      $passRight=true;
-      $id=$tempID;
-      $username=getUserField($id, "username");
-      $usergroup=getUserField($id, "usergroup");
-      $_SESSION['id']=$id;
-      $_SESSION['username']=$username;
-      $_SESSION['usergroup']=$usergroup;
-      $cookieTime=NULL;
-      if($rememberMe == "on") $cookieTime=time()+(60*60*24*365*8);
-      setcookie("forums", session_id(), $cookieTime, "/forums/");
-      setSeshInfo(session_id(), $_SERVER['REMOTE_ADDR'], $id, $username);
+      $tooShort=false;
+      $tempID=checkPassword($uname, $pword);
+      if($tempID != NULL)
+      {
+        echo 'credentials verified.. logging in..';
+        $passRight=true;
+        $id=$tempID;
+        // $username=getUserField($id, "username");
+
+        $_SESSION['id']=$id;
+        $_SESSION['username']= $uname; //$username;
+
+        $cookieTime=NULL;
+        if($rememberMe == "on") $cookieTime=time()+(60*60*24*365*8);
+        setcookie("forums", session_id(), $cookieTime, "/forums/");
+        setSeshInfo(session_id(), $_SERVER['REMOTE_ADDR'], $id);
+      }
     }
   }
+
+}
+else {
+  echo "TRACE: ALREADY LOGGED IN!<br>";
 }
 
-// }
 
 
-/*
-require_once('session.php');
-*/
+require_once('php/session.php');
+
 
 ?>
 <!DOCTYPE HTML>
@@ -74,9 +77,9 @@ echo <<<LOGGINGIN
 <div class="titlebar"><h4 class="titlebarheader">Logging In</h4></div>
 <div class="container">
 <p>You have been successfully logged in.</p>
-<p>Redirecting...or click <a href="index.php">here</a> to proceed.</p>
+<p>Redirecting...or click <a href="php/dashboard.php">here</a> to proceed.</p>
 </div>
-<meta http-equiv='Refresh' content='3;url=index.php'>
+<meta http-equiv='Refresh' content='3;url=php/dashboard.php'>
 LOGGINGIN;
 }
 else
@@ -148,9 +151,9 @@ echo <<<LOGGEDIN
 <div class="titlebar"><h4 class="titlebarheader">Already Logged In</h4></div>
 <div class="container">
 <p>You are already logged in...</p>
-<p>Redirecting...or click <a href="index.php">here</a> to proceed.</p>
+<p>Redirecting...or click <a href="php/dashboard.php">here</a> to proceed.</p>
 </div>
-<meta http-equiv='Refresh' content='3;url=index.php'>
+<meta http-equiv='Refresh' content='3;url=php/dashboard.php'>
 LOGGEDIN;
 }
 else

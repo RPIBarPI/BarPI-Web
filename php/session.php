@@ -6,9 +6,16 @@ if($_SESSION["id"] != NULL)
 $loggedIn=true;
 $id=$_SESSION["id"];
 $username=$_SESSION["username"];
-$usergroup=$_SESSION["usergroup"];
-refreshOnline($id);
+//$usergroup=$_SESSION["usergroup"];
+//refreshOnline($id);
 }
+
+/*function refreshOnline() {
+    $.get('http://frosthotel.co.uk/refreshstats', function(data) {
+        if(data!=$('#toupdate').html()) $('#toupdate').html(data);
+    });
+}*/
+
 /*echo <<<CONFETTI
 <canvas style='position:fixed;pointer-events: none;' id="canvas"></canvas>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
