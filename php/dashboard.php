@@ -3,7 +3,8 @@
   require_once('cookie.php');
   require_once('session.php');
 
-  $id = $_SESSION["id"]; // get this from the login page
+  //Get the ID from the session and open a connection to the DB
+  $id = $_SESSION["id"];
   $db = mysqli_connect($servername, $DB_username, $DB_password, $defaultdb, $port);
   $query = 'SELECT * FROM bars WHERE id='. $id . ';';
   $result = $db->query($query);
@@ -22,6 +23,8 @@
       $country = $row['country'];
       $address = $aptno . ' ' . $street . ', ' . $city . ', ' . $state . ' ' . $zip . ' ' . $country;
 
+      // Called when the update button is clicked
+      //  (i.e., name/address is updated)
       if (isset($_POST['update'])) {
         $db = mysqli_connect($servername, $DB_username, $DB_password, $defaultdb, $port);
         $newName = $_POST['barName'];
@@ -52,9 +55,7 @@
         mysqli_close($db);
       }
 
-      // TODO: finish and test this
-      // TODO: get drink id from the selected drink
-      // TODO: convert the inputted price to a float
+      // Called when an event or special is added
       if (isSet($_POST['add'])) {
         $isSpecial = 0;
         if ($_POST['isSpecial'] === 'on') $isSpecial = 1;
@@ -72,6 +73,7 @@
         $result = $db->query($query);
       }
 
+      //The form for updating the name/address
       echo '<form method=\'POST\' action=\'dashboard.php\'>' .
             '<h1>Welcome ' . $barName . '!</h1>' .
             '<p>Your current address is: ' . $address . '</p>' .
@@ -87,6 +89,7 @@
             '<br><br><input type=\'submit\' value=\'Update\' name=\'update\'>' .
            '</form>';
 
+      // Get the list of drinks associated with this bar from the DB
       $drinks = array();
       $query = 'SELECT * FROM drink WHERE barid=' . $id;
       $result = $db->query($query);
@@ -96,6 +99,7 @@
         }
       }
 
+      //The form for adding an event or special
       echo '<hr><form method=\'POST\' action=\'dashboard.php\'>' .
             '<h4>Create event/special</h4>' .
             '<input type=\'checkbox\' name=\'isSpecial\'>Special (if left unchecked, this will be registered as an event)' .
@@ -112,10 +116,12 @@
       echo '<br><br><input type=\'submit\' value=\'Add Event/Special\' name=\'add\'>';
       echo '</form>';
     } else {
+      //This code should never run. This means that there are two locations with the same barid value.
       echo '<h1>ERROR: did not find one row (in locations) associated with barid: ' . $id . '</h1>';
       echo 'Found: ' . $result->num_rows;
     }
   } else {
+    // This code should never run. This means that there are two bars with the same id.
     echo '<h1>ERROR: did not find one row (in bars) associated with barid:' . $id . '</h1>';
     echo 'Found: ' . $result;
   }
