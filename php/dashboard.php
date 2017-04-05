@@ -43,7 +43,7 @@
                   mysqli_real_escape_string($db, $newCountry) . '\' WHERE barid=' .
                   $id;
         $result = $db->query($query);
-        $aptno = $newAptNo;
+        $aptno = $newAptno;
         $street = $newStreet;
         $city = $newCity;
         $state = $newState;
@@ -108,11 +108,13 @@
         }
       }
 
-      echo '<form method=\'POST\' action=\'dashboard.php\'>' .
+?>
+
+<!--  echo '<form method=\'POST\' action=\'dashboard.php\'>' .
             '<h1>Welcome ' . $barName . '!</h1>' .
             '<p>Your current address is: ' . $address . '</p>' .
             'Change bar name: ' .
-            '<input type=\'text\' name=\'barName\' required>' .
+            '<input type="text" name="barName" value="<?php echo htmlentities($barName); ?>" required>' .
             '<br><br>Change bar address: ' .
             '<br><br>Apartment no.: <input type=\'text\' name=\'aptno\' required>' .
             '<br><br>Street: <input type=\'text\' name=\'street\' required>' .
@@ -121,7 +123,26 @@
             '<br><br>ZIP: <input type=\'text\' name=\'zip\' required>' .
             '<br><br>Country: <input type=\'text\' name=\'country\' required>' .
             '<br><br><input type=\'submit\' value=\'Update\' name=\'update\'>' .
-           '</form>';
+           '</form>'; -->
+
+<html>
+      <form method='POST' action='dashboard.php'>
+            <h1>Welcome <?php echo htmlentities($barName); ?></h1>
+            <p>Your current address is: <?php echo htmlentities($address); ?> </p>
+            Change bar name: 
+            <input type="text" name="barName" value="<?php echo htmlentities($barName); ?>" required>
+            <br><br>Change bar address: 
+            <br><br>Apartment no.: <input type='text' name='aptno' value="<?php echo htmlentities($aptno); ?>" required>
+            <br><br>Street: <input type='text' name='street' value="<?php echo htmlentities($street); ?>" required>
+            <br><br>City: <input type='text' name='city' value="<?php echo htmlentities($city); ?>" required>
+            <br><br>State: <input type='text' name='state' value="<?php echo htmlentities($state); ?>" required>
+            <br><br>ZIP: <input type='text' name='zip' value="<?php echo htmlentities($zip); ?>" required>
+            <br><br>Country: <input type='text' name='country' value="<?php echo htmlentities($country); ?>" required>
+            <br><br><input type='submit' value='Update' name='update'>
+           </form>
+</html>
+
+<?php
 
       $drinks = array();
       $query = 'SELECT * FROM drink WHERE barid=' . $id;
@@ -131,6 +152,8 @@
           array_push($drinks, $row);
         }
       }
+
+
 
       echo '<hr><form method=\'POST\' action=\'dashboard.php\'>' .
             '<h4>Create event/special</h4>' .
