@@ -24,6 +24,8 @@
       $country = $row['country'];
       $address = $aptno . ' ' . $street . ', ' . $city . ', ' . $state . ' ' . $zip . ' ' . $country;
 
+      // Called when the update button is bclicked
+      //  (i.e., name/address is updated)
       if (isset($_POST['update'])) {
         $db = mysqli_connect($servername, $DB_username, $DB_password, $defaultdb, $port);
         $newName = $_POST['barName'];
@@ -57,7 +59,7 @@
       // TODO: finish and test this
       // TODO: get drink id from the selected drink
       // TODO: convert the inputted price to a float
-
+      // Called when an event or special is added
       if (isSet($_POST['add'])) {
         $price = $_POST['price'];
         if ($price[0] == '$') {
@@ -121,7 +123,33 @@
         }
       }
 
+      // The function to remove a drink
+      if (isSet($_POST['removeDrink'])) {
+        $query = 'DELETE FROM drink WHERE name=\'' .
+                    mysqli_real_escape_string($db, $_POST['drink']) .
+                    '\' and barid=' . $id;
+        $result = $db->query($query);
+        echo $db->error;
+      }
 
+      //The form for updating the name/address
+      echo '<form method=\'POST\' action=\'dashboard.php\'>' .
+            '<h1>Welcome ' . $barName . '!</h1>' .
+            '<p>Your current address is: ' . $address . '</p>' .
+            'Change bar name: ' .
+            '<input type=\'text\' name=\'barName\' required>' .
+            '<br><br>Change bar address: ' .
+            '<br><br>Apartment no.: <input type=\'text\' name=\'aptno\' required>' .
+            '<br><br>Street: <input type=\'text\' name=\'street\' required>' .
+            '<br><br>City: <input type=\'text\' name=\'city\' required>' .
+            '<br><br>State: <input type=\'text\' name=\'state\' required>' .
+            '<br><br>ZIP: <input type=\'text\' name=\'zip\' required>' .
+            '<br><br>Country: <input type=\'text\' name=\'country\' required>' .
+            '<br><br><input type=\'submit\' value=\'Update\' name=\'update\'>' .
+           '</form>';
+
+      // Get the list of drinks associated with this bar from the DB
+      $drinks = array();
       $query = 'SELECT * FROM drink WHERE barid='. $id . ' AND IsSpecialToday=1;';
       $result = $db->query($query);
       if ($result) {
@@ -133,6 +161,13 @@
         echo "ERROR: Bar ID not found<br>";
       }
 
+      //The form for adding an event or special
+      echo '<hr><form method=\'POST\' action=\'dashboard.php\'>' .
+            '<h4>Create event/special</h4>' .
+            '<input type=\'checkbox\' name=\'isSpecial\'>Special (if left unchecked, this will be registered as an event)' .
+            '<br><br>Name of event/special: <input type=\'text\' name=\'name\' required>' .
+            '<br><br>Description: <input type=\'text\' name=\'description\' size=\'80\' required>' .
+            '<br><br>Drink: <select name=\'drinks\' required>';
 
       if (isSet($_POST['set_special'])) {
 
@@ -157,17 +192,30 @@
 
         $old_special_id = $special_id;
       }
+      
+      echo '</select>';
+      echo '<br><br>Price: <input type=\'text\' name=\'price\' required>';
+      echo '<br><br><input type=\'submit\' value=\'Add Event/Special\' name=\'add\'>';
+      echo '</form>';
 
+      echo '<hr><form method=\'POST\' action=\'dashboard.php\'>'.
+            '<h4>Remove Drink</h4>' .
+            'Drinks: <select name=\'drink\' required>';
 
-    }
-    
-    
-    else {
+      foreach($drinks as $d) {
+        echo '<option value=\'' . $d['name'] . '\'>' . $d['name'] . '</option>';
+      }
+
+      echo '</select>' .
+            '<br><br><input type=\'submit\' value=\'Remove Drink\' name=\'removeDrink\'>';
+
+    } else {
+      //This code should never run. This means that there are two locations with the same barid value.
       echo '<h1>ERROR: did not find one row (in locations) associated with barid: ' . $id . '</h1>';
       echo 'Found: ' . $result->num_rows;
     }
-  } 
-  else {
+  } else {
+    // This code should never run. This means that there are two bars with the same id.
     echo '<h1>ERROR: did not find one row (in bars) associated with barid:' . $id . '</h1>';
     echo 'Found: ' . $result;
   }
