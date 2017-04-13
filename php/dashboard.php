@@ -67,7 +67,7 @@
         }
 
         $isSpecial = 0;
-        if ($_POST['isSpecial'] === 'on') 
+        if ($_POST['isSpecial'] === 'on')
         $isSpecial = 1;
 
         if ($isSpecial==1){
@@ -80,15 +80,15 @@
 
           $query = 'INSERT INTO drink (id, name, description, price, barid) ' .
             'VALUES (null, \'' .
-             
+
 
             mysqli_real_escape_string($db, $_POST['name']) . '\', \'' .
             mysqli_real_escape_string($db, $_POST['description']) . '\', \'' .
             mysqli_real_escape_string($db, $price) . '\', \'' .
-            mysqli_real_escape_string($db, $id) . 
+            mysqli_real_escape_string($db, $id) .
             '\');'
           ;
-          
+
           if ($result = $db->query($query) === TRUE){
             if ($TRACE){
               echo "TRACE: Tried query:$query<br>\tsuccessfully inserted special/drink!, return value: $result!<br>";
@@ -118,7 +118,7 @@
           //             mysqli_real_escape_string($db, $_POST['drink'].id) .  '\', \'' .
           //             mysqli_real_escape_string($db, $price) . '\', \'' .
           //             $isSpecial . '\');';
-          
+
           $result = $db->query($query);
         }
       }
@@ -132,22 +132,6 @@
         echo $db->error;
       }
 
-      //The form for updating the name/address
-      echo '<form method=\'POST\' action=\'dashboard.php\'>' .
-            '<h1>Welcome ' . $barName . '!</h1>' .
-            '<p>Your current address is: ' . $address . '</p>' .
-            'Change bar name: ' .
-            '<input type=\'text\' name=\'barName\' required>' .
-            '<br><br>Change bar address: ' .
-            '<br><br>Apartment no.: <input type=\'text\' name=\'aptno\' required>' .
-            '<br><br>Street: <input type=\'text\' name=\'street\' required>' .
-            '<br><br>City: <input type=\'text\' name=\'city\' required>' .
-            '<br><br>State: <input type=\'text\' name=\'state\' required>' .
-            '<br><br>ZIP: <input type=\'text\' name=\'zip\' required>' .
-            '<br><br>Country: <input type=\'text\' name=\'country\' required>' .
-            '<br><br><input type=\'submit\' value=\'Update\' name=\'update\'>' .
-           '</form>';
-
       // Get the list of drinks associated with this bar from the DB
       $drinks = array();
       $query = 'SELECT * FROM drink WHERE barid='. $id . ' AND IsSpecialToday=1;';
@@ -160,14 +144,6 @@
       else {
         echo "ERROR: Bar ID not found<br>";
       }
-
-      //The form for adding an event or special
-      echo '<hr><form method=\'POST\' action=\'dashboard.php\'>' .
-            '<h4>Create event/special</h4>' .
-            '<input type=\'checkbox\' name=\'isSpecial\'>Special (if left unchecked, this will be registered as an event)' .
-            '<br><br>Name of event/special: <input type=\'text\' name=\'name\' required>' .
-            '<br><br>Description: <input type=\'text\' name=\'description\' size=\'80\' required>' .
-            '<br><br>Drink: <select name=\'drinks\' required>';
 
       if (isSet($_POST['set_special'])) {
 
@@ -188,26 +164,10 @@
         if (!$result){
           echo "ERROR: Failed to set new special<br>";
         }
-        
+
 
         $old_special_id = $special_id;
       }
-      
-      echo '</select>';
-      echo '<br><br>Price: <input type=\'text\' name=\'price\' required>';
-      echo '<br><br><input type=\'submit\' value=\'Add Event/Special\' name=\'add\'>';
-      echo '</form>';
-
-      echo '<hr><form method=\'POST\' action=\'dashboard.php\'>'.
-            '<h4>Remove Drink</h4>' .
-            'Drinks: <select name=\'drink\' required>';
-
-      foreach($drinks as $d) {
-        echo '<option value=\'' . $d['name'] . '\'>' . $d['name'] . '</option>';
-      }
-
-      echo '</select>' .
-            '<br><br><input type=\'submit\' value=\'Remove Drink\' name=\'removeDrink\'>';
 
     } else {
       //This code should never run. This means that there are two locations with the same barid value.
@@ -228,9 +188,9 @@
       <form method='POST' action='dashboard.php'>
             <h1>Welcome <?php echo htmlentities($barName); ?></h1>
             <p>Your current address is: <?php echo htmlentities($address); ?> </p>
-            Change bar name: 
+            Change bar name:
             <input type="text" name="barName" value="<?php echo htmlentities($barName); ?>" required>
-            <br><br>Change bar address: 
+            <br><br>Change bar address:
             <br><br>Apartment no.: <input type='text' name='aptno' value="<?php echo htmlentities($aptno); ?>" required>
             <br><br>Street: <input type='text' name='street' value="<?php echo htmlentities($street); ?>" required>
             <br><br>City: <input type='text' name='city' value="<?php echo htmlentities($city); ?>" required>
@@ -249,20 +209,20 @@
       // =========================
       echo '<hr><form method=\'POST\' action=\'dashboard.php\'>' .
             '<h3>Create event/special</h3>' .
-            '<input type=\'checkbox\' name=\'isSpecial\'>Special (if left unchecked, this will be registered as an event)' 
-            ; ;          
-      
+            '<input type=\'checkbox\' name=\'isSpecial\'>Special (if left unchecked, this will be registered as an event)'
+            ; ;
+
 
       echo  '<br><br>Name of event/special: <input type=\'text\' name=\'name\' required>' .
             '<br><br>Description: <input type=\'text\' name=\'description\' size=\'80\' required>';       ;
 
-      
+
 
 
       echo '<br><br>Price: <input type=\'text\' name=\'price\' required>';
       echo '<br><br><input type=\'submit\' value=\'Add Event/Special\' name=\'add\'>';
       echo '</form>';
-  
+
 
 
     // ===================
@@ -276,15 +236,15 @@
         array_push($drinks, $row);
       }
     }
-    
+
 
 
     echo '<hr><form method=\'POST\' action=\'dashboard.php\'>' .
             '<h3>Set special</h3>' .
             //'<input type=\'checkbox\' name=\'isSpecial\'>Special (if left unchecked, this will be registered as an event)' .
-            
+
             'Pre-existing Drink: <select name=\'drink_options\' id =\'drink_options\' > <br><br>';
-      
+
       foreach($drinks as $d) {
         echo "<option value=". $d['id'] . ">" . $d['name'] . '</option>';
       }
@@ -307,8 +267,24 @@
 
 
       echo  '<b><br><br><br><br>Current special: ' . $sName .
-            '<br>Description: ' . $sDescription . 
+            '<br>Description: ' . $sDescription .
             '<br>Price: $' . $sPrice . '<br><br><b>'; ;
+
+
+    // ==============
+    // Remove a drink
+    // ==============
+
+    echo '<hr><form method=\'POST\' action=\'dashboard.php\'>'.
+          '<h4>Remove Drink</h4>' .
+          'Drinks: <select name=\'drink\' required>';
+
+    foreach($drinks as $d) {
+      echo '<option value=\'' . $d['name'] . '\'>' . $d['name'] . '</option>';
+    }
+
+    echo '</select>' .
+          '<br><br><input type=\'submit\' value=\'Remove Drink\' name=\'removeDrink\'>';
 
 
 ?>
