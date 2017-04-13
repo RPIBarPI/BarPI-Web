@@ -23,7 +23,7 @@
       $country = $row['country'];
       $address = $aptno . ' ' . $street . ', ' . $city . ', ' . $state . ' ' . $zip . ' ' . $country;
 
-      // Called when the update button is clicked
+      // Called when the update button is bclicked
       //  (i.e., name/address is updated)
       if (isset($_POST['update'])) {
         $db = mysqli_connect($servername, $DB_username, $DB_password, $defaultdb, $port);
@@ -73,6 +73,15 @@
         $result = $db->query($query);
       }
 
+      // The function to remove a drink
+      if (isSet($_POST['removeDrink'])) {
+        $query = 'DELETE FROM drink WHERE name=\'' .
+                    mysqli_real_escape_string($db, $_POST['drink']) .
+                    '\' and barid=' . $id;
+        $result = $db->query($query);
+        echo $db->error;
+      }
+
       //The form for updating the name/address
       echo '<form method=\'POST\' action=\'dashboard.php\'>' .
             '<h1>Welcome ' . $barName . '!</h1>' .
@@ -115,6 +124,18 @@
       echo '<br><br>Price: <input type=\'text\' name=\'price\' required>';
       echo '<br><br><input type=\'submit\' value=\'Add Event/Special\' name=\'add\'>';
       echo '</form>';
+
+      echo '<hr><form method=\'POST\' action=\'dashboard.php\'>'.
+            '<h4>Remove Drink</h4>' .
+            'Drinks: <select name=\'drink\' required>';
+
+      foreach($drinks as $d) {
+        echo '<option value=\'' . $d['name'] . '\'>' . $d['name'] . '</option>';
+      }
+
+      echo '</select>' .
+            '<br><br><input type=\'submit\' value=\'Remove Drink\' name=\'removeDrink\'>';
+
     } else {
       //This code should never run. This means that there are two locations with the same barid value.
       echo '<h1>ERROR: did not find one row (in locations) associated with barid: ' . $id . '</h1>';
