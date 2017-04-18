@@ -24,7 +24,7 @@
       $country = $row['country'];
       $address = $aptno . ' ' . $street . ', ' . $city . ', ' . $state . ' ' . $zip . ' ' . $country;
 
-      // Called when the update button is bclicked
+      // Called when the update button is clicked
       //  (i.e., name/address is updated)
       if (isset($_POST['update'])) {
         $db = mysqli_connect($servername, $DB_username, $DB_password, $defaultdb, $port);
@@ -56,85 +56,101 @@
         mysqli_close($db);
       }
 
-      // TODO: finish and test this
-      // TODO: get drink id from the selected drink
-      // TODO: convert the inputted price to a float
-      // Called when an event or special is added
-      if (isSet($_POST['add'])) {
+      if (isSet($_POST['addDrink'])) {
+        $name = $_POST['name'];
+        $desc = $_POST['desc'];
         $price = $_POST['price'];
-        if ($price[0] == '$') {
-          $price = substr($price, 1);
-        }
-
-        $isSpecial = 0;
-        if ($_POST['isSpecial'] === 'on')
-        $isSpecial = 1;
-
-        if ($isSpecial==1){
-          // insert a drink
-          //    $query = 'INSERT INTO drink (id, name, description, price, barid) '.
-          //    ' VALUES (null, '.
-
-          //    \''mysqli_real_escape_string($db, $_POST['name'])'\', '.
-          //    '  \'H-O2\', \'0\', \'1002\')
-
-          $query = 'INSERT INTO drink (id, name, description, price, barid) ' .
-            'VALUES (null, \'' .
-
-
-            mysqli_real_escape_string($db, $_POST['name']) . '\', \'' .
-            mysqli_real_escape_string($db, $_POST['description']) . '\', \'' .
-            mysqli_real_escape_string($db, $price) . '\', \'' .
-            mysqli_real_escape_string($db, $id) .
-            '\');'
-          ;
-
-          if ($result = $db->query($query) === TRUE){
-            if ($TRACE){
-              echo "TRACE: Tried query:$query<br>\tsuccessfully inserted special/drink!, return value: $result!<br>";
-            }
-            else{
-              echo "Drink Successfully added!<br>";
-            }
+        $query = 'INSERT INTO drink (id, name, description, price, barid, isOnMenuToday) ' .
+                  'VALUES (null, \'' .
+                  mysqli_real_escape_string($db, $name) . '\', \'' .
+                  mysqli_real_escape_string($db, $desc) . '\', \'' .
+                  mysqli_real_escape_string($db, $price) . '\', \'' .
+                  $id . '\', \'0\');';
+        $result = $db->query($query);
+        if ($result === TRUE){
+          if ($TRACE){
+            echo "TRACE: Tried query:$query<br>\tsuccessfully inserted drink!, return value: $result!<br>";
           }
-          else {
-            if ($TRACE) {
-              echo "TRACE: special/drink not saved in db :(<br>Tried query:$query<br>";
-            }
-            else{
-              echo "Drink was NOT added :(<br>";
-            }
+          else{
+            echo "Drink Successfully added!<br>";
           }
-
         }
         else {
-          // insert an event
+          if ($TRACE) {
+            echo "TRACE: Drink not saved in db :(<br>Tried query:$query<br>";
+          }
+          else{
+            echo "Drink was NOT added :(<br>";
+          }
+        }
+      }
 
-          // TODO
-          // $query = 'INSERT INTO event (barid, name, description, drinkid, price, special) ' .
-          //             'VALUES (\'' . mysqli_real_escape_string($db, $id) . '\', \'' .
-          //             mysqli_real_escape_string($db, $_POST['name']) . '\', \'' .
-          //             mysqli_real_escape_string($db, $_POST['description']) . '\', \'' .
-          //             mysqli_real_escape_string($db, $_POST['drink'].id) .  '\', \'' .
-          //             mysqli_real_escape_string($db, $price) . '\', \'' .
-          //             $isSpecial . '\');';
-
-          $result = $db->query($query);
+      // Called when an event or special is added
+      if (isSet($_POST['addEvent'])) {
+        $name = $_POST['name'];
+        $desc = $_POST['desc'];
+        $query = 'INSERT INTO event (id, barid, name, description, IsEventToday) VALUES (' .
+                  'null, \'' . $id . '\', \'' .
+                  mysqli_real_escape_string($db, $name) . '\', \'' .
+                  mysqli_real_escape_string($db, $desc) . '\', 0);';
+        $result = $db->query($query);
+        if ($result === TRUE){
+          if ($TRACE){
+            echo "TRACE: Tried query:$query<br>\tsuccessfully inserted event!, return value: $result!<br>";
+          }
+          else{
+            echo "Event Successfully added!<br>";
+          }
+        }
+        else {
+          if ($TRACE) {
+            echo "TRACE: Event not saved in db :(<br>Tried query:$query<br>";
+          }
+          else{
+            echo "Event was NOT added :(<br>";
+          }
         }
       }
 
       // The function to remove a drink
       if (isSet($_POST['removeDrink'])) {
-        $query = 'DELETE FROM drink WHERE name=\'' .
-                    mysqli_real_escape_string($db, $_POST['drink']) .
-                    '\' and barid=' . $id;
+        $did = $_POST['drink'];
+        $query = 'DELETE FROM drink WHERE id=\'' .
+                    $did . '\';';
         $result = $db->query($query);
-        echo $db->error;
+        if ($result === TRUE){
+          if ($TRACE){
+            echo "TRACE: Tried query:$query<br>\tsuccessfully deleted drink!, return value: $result!<br>";
+          }
+          else{
+            echo "Drink successfully deleted!<br>";
+          }
+        }
+        else {
+            echo "Drink was NOT deleted :(<br>";
+        }
+      }
+
+      if (isSet($_POST['removeEvent'])) {
+        $eid = $_POST['event'];
+        $query = 'DELETE FROM event WHERE id=\'' . $eid . '\';';
+        $result = $db->query($query);
+        if ($result === TRUE){
+          if ($TRACE){
+            echo "TRACE: Tried query:$query<br>\tsuccessfully deleted event!, return value: $result!<br>";
+          }
+          else{
+            echo "Event Successfully deleted!<br>";
+          }
+        }
+        else {
+            echo "Event was NOT deleted :(<br>";
+        }
       }
 
       // Get the list of drinks associated with this bar from the DB
       $drinks = array();
-      $query = 'SELECT * FROM drink WHERE barid='. $id . ' AND IsSpecialToday=1;';
+      $query = 'SELECT * FROM drink WHERE barid='. $id . ';';
       $result = $db->query($query);
       if ($result) {
         $row = $result->fetch_assoc();
@@ -203,88 +219,107 @@
 
 <?php
 
+      // ==============
+      // create a drink
+      // ==============
+      echo '<hr><form method =\'POST\' action=\'dashboard.php\'>' .
+            '<h3>Create drink</h3>' .
+            'Name of drink: <input type=\'text\' name=\'name\' required>' .
+            '<br><br>Description: <input type=\'text\' name=\'desc\' required>' .
+            '<br><br>Price: $<input type=\'number\' name=\'price\' step=\'.01\' required>' .
+            '<br><br><input type=\'submit\' value=\'Add Drink\' name=\'addDrink\'>' .
+            '</form>';
 
-      // =========================
-      // create / edit an event or special
-      // =========================
+
+      // ===============
+      // create an event
+      // ===============
       echo '<hr><form method=\'POST\' action=\'dashboard.php\'>' .
-            '<h3>Create event/special</h3>' .
-            '<input type=\'checkbox\' name=\'isSpecial\'>Special (if left unchecked, this will be registered as an event)'
-            ; ;
-
-
-      echo  '<br><br>Name of event/special: <input type=\'text\' name=\'name\' required>' .
-            '<br><br>Description: <input type=\'text\' name=\'description\' size=\'80\' required>';       ;
-
-
-
-
-      echo '<br><br>Price: <input type=\'text\' name=\'price\' required>';
-      echo '<br><br><input type=\'submit\' value=\'Add Event/Special\' name=\'add\'>';
+            '<h3>Create event</h3>';
+      echo  'Name of event: <input type=\'text\' name=\'name\' required>' .
+            '<br><br>Description: <input type=\'text\' name=\'desc\' size=\'80\' required>';
+      echo '<br><br><input type=\'submit\' value=\'Add Event\' name=\'addEvent\'>';
       echo '</form>';
 
+      // ==============
+      // Remove a drink
+      // ==============
 
+      echo '<hr><form method=\'POST\' action=\'dashboard.php\'>'.
+            '<h3>Remove Drink</h3>' .
+            'Drinks: <select name=\'drink\' required>';
 
-    // ===================
-    // set today's special
-    // ===================
-    $drinks = array();
-    $query = 'SELECT * FROM drink WHERE barid=' . $id;
-    $result = $db->query($query);
-    if ($result->num_rows >= 1) {
-      while ($row = $result->fetch_assoc()) {
-        array_push($drinks, $row);
-      }
-    }
-
-
-
-    echo '<hr><form method=\'POST\' action=\'dashboard.php\'>' .
-            '<h3>Set special</h3>' .
-            //'<input type=\'checkbox\' name=\'isSpecial\'>Special (if left unchecked, this will be registered as an event)' .
-
-            'Pre-existing Drink: <select name=\'drink_options\' id =\'drink_options\' > <br><br>';
-
-      foreach($drinks as $d) {
-        echo "<option value=". $d['id'] . ">" . $d['name'] . '</option>';
-      }
-      echo '<br><br><input type=\'submit\' value=\'Set Special\' name=\'set_special\'>';
-      echo '</form>';
-
-
-      // display the current special
-      $query = 'SELECT * FROM drink WHERE IsSpecialToday=1 AND id=' . $special_id . ' AND barid=' . $id;
+      $query = 'SELECT * FROM drink WHERE barid=\'' . $id . '\';';
+      $drinks = array();
       $result = $db->query($query);
-      if ($result){
-        $row = $result->fetch_assoc();
-        $sName = $row['name'];
-        $sDescription = $row['description'];
-        $sPrice = $row['price'];
+      while ($drink = mysqli_fetch_array($result)) {
+        $drinks[] = $drink;
       }
-      else{
-        echo "ERROR: Failed to get current special<br>";
+      foreach($drinks as $d) {
+        echo '<option value=\'' . $d['id'] . '\'>' . $d['name'] . '</option>';
       }
 
+      echo '</select>' .
+            '<br><br><input type=\'submit\' value=\'Remove Drink\' name=\'removeDrink\'>';
 
-      echo  '<b><br><br><br><br>Current special: ' . $sName .
-            '<br>Description: ' . $sDescription .
-            '<br>Price: $' . $sPrice . '<br><br><b>'; ;
+      // ===============
+      // Remove an event
+      // ===============
 
+      echo '<hr><form method=\'POST\' action=\'dashboard.php\'>' .
+            '<h3>Remove event</h3>' .
+            'Events: <select name=\'event\' required>';
 
-    // ==============
-    // Remove a drink
-    // ==============
+      $query = 'SELECT * FROM event WHERE barid=\'' . $id . '\';';
+      $events = array();
+      $result = $db->query($query);
+      while($event = mysqli_fetch_array($result)) {
+        $events[] = $event;
+      }
+      foreach($events as $e) {
+        echo '<option value=\'' . $e['id'] . '\'>' . $e['name'] . '</option>';
+      }
 
-    echo '<hr><form method=\'POST\' action=\'dashboard.php\'>'.
-          '<h4>Remove Drink</h4>' .
-          'Drinks: <select name=\'drink\' required>';
-
-    foreach($drinks as $d) {
-      echo '<option value=\'' . $d['name'] . '\'>' . $d['name'] . '</option>';
-    }
-
-    echo '</select>' .
-          '<br><br><input type=\'submit\' value=\'Remove Drink\' name=\'removeDrink\'>';
-
+      echo '</select>' .
+            '<br><br><input type=\'submit\' value=\'Remove Event\' name=\'removeEvent\'>';
 
 ?>
+
+<!-- Weekly Calendar -->
+<html>
+  <hr>
+  <h3>Weekly Calendar</h3>
+  <table border='1'>
+    <tr>
+      <th>Sunday</th>
+      <th>Monday</th>
+      <th>Tuesday</th>
+      <th>Wednesday</th>
+      <th>Thursday</th>
+      <th>Friday</th>
+      <th>Saturday</th>
+    </tr>
+    <tr>
+      <td><!-- Sunday -->
+        S
+      </td>
+      <td><!-- Monday -->
+        M
+      </td>
+      <td><!-- Tuesday -->
+        T
+      </td>
+      <td><!-- Wednesday -->
+        W
+      </td>
+      <td><!-- Thursday -->
+        T
+      </td>
+      <td><!-- Friday -->
+        F
+      </td>
+      <td><!-- Saturday -->
+        S
+      </td>
+  </table>
+</html>
