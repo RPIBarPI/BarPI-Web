@@ -64,7 +64,7 @@ else {
   $passRight=true;
   $loggingIn ="true";
   $tooShort=false;
-  
+
 }
 
 
@@ -75,9 +75,18 @@ require_once('php/session.php');
 ?>
 <!DOCTYPE HTML>
 <html lang="en">
+
+<!-- Bootstap sourcing -->
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+
 <!--<link href="style/style.css" rel="stylesheet" type="text/css"> -->
-<title>BarPI | Login</title>
+  <title>BarPI | Login</title>
 </head>
 <body>
 <?php //include("header.php");
@@ -110,19 +119,24 @@ echo <<<FORMINCORECT
       <div class="container">
       <p>Your username or password was incorrect.</p>
       <form action="index.php?login=true" method="post" >
+        <div class="form-group">
+        
         Email:
         <br>
-        <input type="email" name="uname" id="uname" required>
+        <input type="email" name="uname" id="uname" class="form-control" required>
         <br>
         Password:
         <br>
-        <input type="password" name="pword" required>
+        <input type="password" name="pword" class="form-control" required>
         <br>
-        Remember me:
-        <input type='checkbox' name='rememberme'>
+
+        </div>
+        <div class="checkbox">
+        <lable><input type='checkbox' name='rememberme'> Remember me</lable>
+        </div>
         <br>
         <br>
-        <input type="submit" value="Submit">
+        <input type="submit" value="Submit" class="btn btn-default">
       </form>
     </center>
 
@@ -142,6 +156,8 @@ echo <<<FORMEMPTY
       <div class="container">
       <p>Your username or password was incorrect.</p>
       <form action="index.php?login=true" method="post" >
+        <div class="form-group">
+        
         Email:
         <br>
         <input type="email" name="uname" id="uname" required>
@@ -150,11 +166,15 @@ echo <<<FORMEMPTY
         <br>
         <input type="password" name="pword" required>
         <br>
+
+        </div>
+        <div class="checkbox">
         Remember me:
         <input type='checkbox' name='rememberme'>
+        </div>
         <br>
         <br>
-        <input type="submit" value="Submit">
+        <input type="submit" value="Submit" class="btn btn-default">
       </form>
     </center>
 
@@ -198,7 +218,7 @@ echo <<<FORM
         <input type='checkbox' name='rememberme'>
         <br>
         <br>
-        <input type="submit" value="Submit">
+        <input type="submit" value="Login" class="btn btn-default" >
       </form>
     </center>
 
