@@ -61,6 +61,10 @@ if($_SESSION["id"] == NULL)
 }
 else {
   echo "TRACE: ALREADY LOGGED IN!<br>";
+  $passRight=true;
+  $loggingIn ="true";
+  $tooShort=false;
+  
 }
 
 

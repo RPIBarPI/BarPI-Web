@@ -6,6 +6,21 @@
 
   $TRACE = 0; // for debugging print statements
 
+  
+  // check if logging out
+  if (isset($_POST['Logout'])){
+    $_SESSION['id']=NULL;
+    $_SESSION['username']=NULL; //$username;
+  }
+
+  // not logged in! return to sign-in page
+  if (! isset($_SESSION['id']) || ! isset($_SESSION['username'])){
+      session_destroy();
+      echo "ERROR: Not logged in! returning to login page..";
+      header("Location: ../index.php"); /* Redirect browser */
+      exit();
+  }
+
   $id = $_SESSION["id"]; // get barid from the login page
   // Set up the connection to the database
   $db = mysqli_connect($servername, $DB_username, $DB_password, $defaultdb, $port);
@@ -264,10 +279,25 @@
 ?>
 
 
+
+
 <html>
+
+<!-- Bootstap sourcing -->
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+
       <!-- Displays the bar's information and address -->
       <form method='POST' action='dashboard.php'>
-            <h1>Welcome <?php echo htmlentities($barName); ?></h1>
+            <h1>Welcome <?php echo htmlentities($barName); ?>          <button type="submit" name="Logout" value='Logout' class="btn btn-default">Logout</button>
+
+            </h1>
+
             <p>Your current address is: <?php echo htmlentities($address); ?> </p>
             Change bar name:
             <input type="text" name="barName" value="<?php echo htmlentities($barName); ?>" required>
