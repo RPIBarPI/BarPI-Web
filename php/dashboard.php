@@ -132,6 +132,10 @@
         else {
             echo "Drink was NOT deleted :(<br>";
         }
+        // In addition, you must also remove any entries from the specialinfo table
+        //  associated with the drink being removed
+        $query = 'DELETE * FROM specialinfo WHERE drinkid=' . $did . ';';
+        $db->query($query);
       }
 
       // Called when the "Remove Event" button is clicked
@@ -150,6 +154,25 @@
         else {
             echo "Event was NOT deleted :(<br>";
         }
+        // In addition to deleting the row from the event table, you must also
+        //  delete the event from the barCalendar table, and any drinks associated
+        //  with the event from the specialinfo table
+        $query = 'UPDATE barCalendar SET sunday = NULL WHERE sunday =' . $eid . ';';
+        $db->query($query);
+        $query = 'UPDATE barCalendar SET monday = NULL where monday =' . $eid . ';';
+        $db->query($query);
+        $query = 'UPDATE barCalendar SET tuesday = NULL WHERE tuesday=' . $eid . ';';
+        $db->query($query);
+        $query = 'UPDATE barCalendar SET wednesday = NULL WHERE wednesday =' . $eid . ';';
+        $db->query($query);
+        $query = 'UPDATE barCalendar SET thursday = NULL WHERE thursday =' . $eid . ';';
+        $db->query($query);
+        $query = 'UPDATE barCalendar SET friday = NULL WHERE friday=' . $eid . ';';
+        $db->query($query);
+        $query = 'UPDATE barCalendar SET saturday = NULL WHERE saturday =' . $eid . ';';
+        $db->query($query);
+        $query = 'DELETE * FROM specialinfo WHERE eventid=' . $eid . ';';
+        $db->query($query);
       }
 
       // Called when the "Select Event" button is clicked in the scheduler
@@ -260,28 +283,28 @@
 
       <!-- Displays the "Create Drink" form -->
       <hr>
-      <form method =\'POST\' action=\'dashboard.php\'>
+      <form method ='POST' action='dashboard.php'>
         <h3>Create drink</h3>
-          Name of drink: <input type=\'text\' name=\'name\' required>
-          <br><br>Description: <input type=\'text\' name=\'desc\' required>
-          <br><br>Price: $<input type=\'number\' name=\'price\' step=\'.01\' required>
-          <br><br><input type=\'submit\' value=\'Add Drink\' name=\'addDrink\'>
+          Name of drink: <input type='text' name='name' required>
+          <br><br>Description: <input type='text' name='desc' required>
+          <br><br>Price: $<input type='number' name='price' step='.01' required>
+          <br><br><input type='submit' value='Add Drink' name='addDrink'>
       </form>
 
       <!-- Displays the "Create Event" form -->
       <hr>
-      <form method=\'POST\' action=\'dashboard.php\'>
+      <form method='POST' action='dashboard.php'>
         <h3>Create event</h3>
-        Name of event: <input type=\'text\' name=\'name\' required>
-        <br><br>Description: <input type=\'text\' name=\'desc\' size=\'80\' required>'
-        <br><br><input type=\'submit\' value=\'Add Event\' name=\'addEvent\'>'
+        Name of event: <input type='text' name='name' required>
+        <br><br>Description: <input type='text' name='desc' size='80' required>'
+        <br><br><input type='submit' value='Add Event' name='addEvent'>'
       </form>
 
       <!-- Displays the "Remove Drink" form -->
       <hr>
-      <form method=\'POST\' action=\'dashboard.php\'>
+      <form method='POST' action='dashboard.php'>
         <h3>Remove Drink</h3>
-        Drinks: <select name=\'drink\' required>
+        Drinks: <select name='drink' required>
         <?php
           $query = 'SELECT * FROM drink WHERE barid=\'' . $id . '\';';
           $drinks = array();
@@ -294,14 +317,14 @@
           }
         ?>
         </select>
-        <br><br><input type=\'submit\' value=\'Remove Drink\' name=\'removeDrink\'>
+        <br><br><input type='submit' value='Remove Drink' name='removeDrink'>
       </form>
 
       <!-- Displays the "Remove Event" form -->
       <hr>
-      <form method=\'POST\' action=\'dashboard.php\'>
+      <form method='POST' action='dashboard.php'>
         <h3>Remove Event</h3>
-        Events: <select name=\'event\' required>
+        Events: <select name='event' required>
         <?php
           $query = 'SELECT * FROM event WHERE barid=\'' . $id . '\';';
           $events = array();
@@ -314,7 +337,7 @@
           }
         ?>
         </select>
-        <br><br><input type=\'submit\' value=\'Remove Event\' name=\'removeEvent\'>
+        <br><br><input type='submit' value='Remove Event' name='removeEvent'>
       </form>
 
 <!-- Function that displays a specified day in the calendar -->
@@ -356,16 +379,18 @@
             $did = $row['id'];
             $query = 'SELECT * FROM specialinfo WHERE drinkid=' . $did . ';';
             $result = $db->query($query);
-            $drink = $result->fetch_assoc();
-            echo 'Drink name: ' . $row['name'] . '<br>';
-            echo 'Drink descrption: ' . $row['description'] . '<br>';
-            echo 'Special price: $' . $drink['price'] . '<br><br>';
-            echo '<form method=\'POST\' action=\'dashboard.php\'>';
-            echo '<input type=\'hidden\' name=\'did\' value=\'' . $row['id'] .
-                    '\'>';
-            echo '<input type=\'hidden\' name=\'eid\' value=\'' . $s[1] . '\'>';
-            echo '<input type=\'submit\' value=\'Remove Special\' name=\'removeDrinkFromSpecial\'>';
-            echo '</form><br>';
+            if ($result == TRUE) {
+              $drink = $result->fetch_assoc();
+              echo 'Drink name: ' . $row['name'] . '<br>';
+              echo 'Drink descrption: ' . $row['description'] . '<br>';
+              echo 'Special price: $' . $drink['price'] . '<br><br>';
+              echo '<form method=\'POST\' action=\'dashboard.php\'>';
+              echo '<input type=\'hidden\' name=\'did\' value=\'' . $row['id'] .
+                      '\'>';
+              echo '<input type=\'hidden\' name=\'eid\' value=\'' . $s[1] . '\'>';
+              echo '<input type=\'submit\' value=\'Remove Special\' name=\'removeDrinkFromSpecial\'>';
+              echo '</form><br>';
+            }
           } else {
             'Failed to retrieve this drink :(<br>';
           }
