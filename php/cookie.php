@@ -1,5 +1,7 @@
 <?php
-
+/*
+ * Initalizes the cookie information for a user
+ */
 	require_once('SQL.php');
 	$loggedIn=false;
 	$usergroup=0;

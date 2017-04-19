@@ -1,22 +1,33 @@
 <?php
 
+// remote database connection info:
 $servername = "seanwaclawik.com"; //"67.240.52.147"; //"localhost";
 $DB_username = "barpi"; //"root";
 $DB_password = "MySQL146"; //"";
 $defaultdb = "medius_barpi";
 $port = 5941;
 
+$TRACE = 0; // for debugging print statements
 
-
+/*
+ *	CheckPassword takes a username and password
+ *		password is hashed using md5 and compared to the database
+ *		Return value is the database id of the user
+ */
 function checkPassword($cUsername, $cPassword)
 {
-	echo "TRACE: checking login..<br>";
-	echo "DEBUG: HERE .01 <br>";
+	if ($TRACE) {
+		echo "TRACE: checking login..<br>";
+		echo "DEBUG: HERE .01 <br>";
+	}
+
 	global $fdbName, $fdbLocation, $fdbUsername, $fdbPassword;
+	
+	// md5 password
 	$cPassword=md5($cPassword);
 
 
-	// create connect
+	// create connection
 	global $servername, $DB_username, $DB_password, $defaultdb, $port;
 
 
@@ -38,9 +49,6 @@ function checkPassword($cUsername, $cPassword)
 
 	$returnValue = $result->fetch_assoc();
 
-	//$returnValue=mysql_fetch_assoc($result);
-	//mysql_free_result($result);
-	//mysql_close($db);
 
 	mysqli_close($db);
 	if ($returnValue["id"]!=null){
@@ -52,6 +60,12 @@ function checkPassword($cUsername, $cPassword)
 
 	return $returnValue["id"];
 }
+
+/*
+ * getSessionInfo takes a session id
+ * 		session is lookedup in db
+ *		the resulting table info is returned to the caller
+ */
 function getSessionInfo($sesh)
 {
 	global $fdbName, $fdbLocation, $fdbUsername, $fdbPassword;
@@ -64,6 +78,13 @@ function getSessionInfo($sesh)
 	mysql_close($db);
 	return $returnValue;
 }
+
+/*
+ * deleteOldSesh takes a session id
+ * 		session is lookedup in db
+ *		the resulting table info is deleted from db
+ *		VOID return
+ */
 function deleteOldSesh($sesh)
 {
 	global $fdbName, $fdbLocation, $fdbUsername, $fdbPassword;
@@ -73,6 +94,12 @@ function deleteOldSesh($sesh)
 	mysql_query($query);
 	mysql_close($db);
 }
+
+/*
+ * setSessionInfo takes a session id, ip address, and bar id associated
+ * 		session is created in db with input values
+ *		VOID return
+ */
 function setSeshInfo($sesh, $sip, $barid)
 {
 	global $servername, $DB_username, $DB_password, $defaultdb, $port;
@@ -107,6 +134,7 @@ function setSeshInfo($sesh, $sip, $barid)
 	}
 
 	mysqli_close($db);
+
 	//return $returnValue["id"];
 }
 

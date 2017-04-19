@@ -4,13 +4,16 @@ require_once('php/cookie.php');
 $tooShort=true;
 $passRight=false;
 
+$TRACE = 0; // for debugging print statements
 
 $loggingIn=$_GET["login"];
 
 session_start();
 if($_SESSION["id"] == NULL)
 {
-
+  /* testInput safety checks input data taking out any hazards
+   * Returns string with hazards removed
+   */
   function testInput($data) {
     $data = trim($data);
     $data = stripslashes($data);
@@ -20,11 +23,18 @@ if($_SESSION["id"] == NULL)
 
   if($loggingIn == "true")
   {
-    echo "DEBUG: loggingIn==true..<br>";
+    if ($TRACE){
+      echo "DEBUG: loggingIn==true..<br>";
+    }
+
     $uname=testInput($_POST["uname"]);
-    echo "uname==".$uname."<br>";
+
+    if ($TRACE){
+      echo "uname==".$uname."<br>";
+    }
+
     $pword=testInput($_POST["pword"]);
-    echo "P:$pword";
+
     $rememberMe=$_POST["rememberme"];
     if((strlen($uname) < 50) && (strlen($uname) > 1) && (strlen($pword) > 5))
     {
@@ -35,7 +45,7 @@ if($_SESSION["id"] == NULL)
         echo 'credentials verified.. logging in..';
         $passRight=true;
         $id=$tempID;
-        // $username=getUserField($id, "username");
+
 
         $_SESSION['id']=$id;
         $_SESSION['username']= $uname; //$username;
@@ -73,6 +83,7 @@ if($tooShort == false)
 {
 if($passRight == true)
 {
+  // Form to redirect to successful login
 echo <<<LOGGINGIN
 <div class="titlebar"><h4 class="titlebarheader">Logging In</h4></div>
 <div class="container">
@@ -84,6 +95,8 @@ LOGGINGIN;
 }
 else
 {
+
+  // incorrect login information! re-display login information
 echo <<<FORMINCORECT
 
 <center>
@@ -112,9 +125,11 @@ echo <<<FORMINCORECT
 </div>
 FORMINCORECT;
 }
+
 }
 else
 {
+  // Form if field(s) left empty re-display login information
 echo <<<FORMEMPTY
 <center>
       <img src="img/logo.png">
@@ -147,6 +162,7 @@ else
 {
 if($loggedIn == true)
 {
+  // succesful login page
 echo <<<LOGGEDIN
 <div class="titlebar"><h4 class="titlebarheader">Already Logged In</h4></div>
 <div class="container">
@@ -158,6 +174,8 @@ LOGGEDIN;
 }
 else
 {
+
+  // default -- display login form
 echo <<<FORM
 
     <center>
