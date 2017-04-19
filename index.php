@@ -160,17 +160,16 @@ echo <<<FORMEMPTY
         
         Email:
         <br>
-        <input type="email" name="uname" id="uname" required>
+        <input type="email" name="uname" id="uname" class="form-control" required>
         <br>
         Password:
         <br>
-        <input type="password" name="pword" required>
+        <input type="password" name="pword" class="form-control" required>
         <br>
 
         </div>
         <div class="checkbox">
-        Remember me:
-        <input type='checkbox' name='rememberme'>
+        <lable><input type='checkbox' name='rememberme'> Remember me</lable>
         </div>
         <br>
         <br>
@@ -206,19 +205,24 @@ echo <<<FORM
       <img src="img/logo.png">
       <h2>Admin Sign-In</h2>
       <form action="index.php?login=true" method="post" >
+        <div class="form-group">
+        
         Email:
         <br>
-        <input type="email" name="uname" id="uname" required>
+        <input type="email" name="uname" id="uname" class="form-control" required>
         <br>
         Password:
         <br>
-        <input type="password" name="pword" required>
+        <input type="password" name="pword" class="form-control" required>
         <br>
-        Remember me:
-        <input type='checkbox' name='rememberme'>
+
+        </div>
+        <div class="checkbox">
+        <lable><input type='checkbox' name='rememberme'> Remember me</lable>
+        </div>
         <br>
         <br>
-        <input type="submit" value="Login" class="btn btn-default" >
+        <input type="submit" value="Submit" class="btn btn-default">
       </form>
     </center>
 
