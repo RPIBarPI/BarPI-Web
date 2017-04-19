@@ -1,3 +1,4 @@
+<!-- Code that handles all of the actions that can take place -->
 <?php
   require_once('SQL.php');
   require_once('cookie.php');
@@ -6,12 +7,15 @@
   $TRACE = 0; // for debugging print statements
 
   $id = $_SESSION["id"]; // get barid from the login page
+  // Set up the connection to the database
   $db = mysqli_connect($servername, $DB_username, $DB_password, $defaultdb, $port);
+  // Get the information associated with this bar
   $query = 'SELECT * FROM bars WHERE id='. $id . ';';
   $result = $db->query($query);
   if ($result->num_rows == 1) {
     $row = $result->fetch_assoc();
     $barName = $row['name'];
+    // Get the address of this bar
     $query = 'SELECT * FROM locations WHERE barid=' . $id;
     $result = $db->query($query);
     if ($result->num_rows === 1) {
@@ -37,7 +41,6 @@
         $newCity = $_POST['city'];
         $newState = $_POST['state'];
         $newZip = $_POST['zip'];
-        echo 'new zip: ' . mysqli_real_escape_string($db, $newZip) . '<br>';
         $newCountry = $_POST['country'];
         $query = 'UPDATE locations SET aptno=\'' . mysqli_real_escape_string($db, $newAptno) .
                   '\', street=\'' . mysqli_real_escape_string($db, $newStreet) . '\', city=\'' .
@@ -53,9 +56,9 @@
         $state = $newState;
         $zip = $newZip;
         $country = $newCountry;
-        mysqli_close($db);
       }
 
+      // Called when the "Add Drink" button is clicked
       if (isSet($_POST['addDrink'])) {
         $name = $_POST['name'];
         $desc = $_POST['desc'];
@@ -85,7 +88,7 @@
         }
       }
 
-      // Called when an event or special is added
+      // Called when the "Add Event" button is clicked
       if (isSet($_POST['addEvent'])) {
         $name = $_POST['name'];
         $desc = $_POST['desc'];
@@ -112,7 +115,7 @@
         }
       }
 
-      // The function to remove a drink
+      // Called when the "Remove Drink" button is clicked
       if (isSet($_POST['removeDrink'])) {
         $did = $_POST['drink'];
         $query = 'DELETE FROM drink WHERE id=\'' .
@@ -131,6 +134,7 @@
         }
       }
 
+      // Called when the "Remove Event" button is clicked
       if (isSet($_POST['removeEvent'])) {
         $eid = $_POST['event'];
         $query = 'DELETE FROM event WHERE id=\'' . $eid . '\';';
@@ -148,6 +152,7 @@
         }
       }
 
+      // Called when the "Select Event" button is clicked in the scheduler
       if (isSet($_POST['selectEvent'])) {
         $day = substr($_POST['event'], 0, 2);
         $eid = substr($_POST['event'], 3);
@@ -184,6 +189,7 @@
         }
       }
 
+      // Called when the "Add Special" button is clicked in the scheduler
       if (isSet($_POST['addSpecial'])) {
         $did = $_POST['did'];
         $eid = $_POST['eid'];
@@ -194,10 +200,8 @@
         $result = $db->query($query);
       }
 
+      // Called when the "Remove Event" button is clicked the scheduler
       if (isSet($_POST['removeEventFromDay'])) {
-        // TODO: fix this then add the functionality to remove an event from a day
-        //    to all of the days
-        // TODO: TEST EVERYTHING
         $day = $_POST['day'];
         $query = 'UPDATE barCalendar SET ' . $day . ' = NULL where barid=' . $id . ';';
         $result = $db->query($query);
@@ -208,6 +212,7 @@
         }
       }
 
+      // Called when the "Remove Special" button is clicked in the scheduler
       if (isSet($_POST['removeDrinkFromSpecial'])) {
         $eid = $_POST['eid'];
         $did = $_POST['did'];
@@ -219,19 +224,6 @@
         } else {
           echo 'Failed to remove drink from this special :(<br>';
         }
-      }
-
-      // Get the list of drinks associated with this bar from the DB
-      $drinks = array();
-      $query = 'SELECT * FROM drink WHERE barid='. $id . ';';
-      $result = $db->query($query);
-      if ($result) {
-        $row = $result->fetch_assoc();
-        $special_id = $row['id'];
-        $old_special_id = $row['id'];
-      }
-      else {
-        echo "ERROR: Bar ID not found<br>";
       }
 
     } else {
@@ -250,6 +242,7 @@
 
 
 <html>
+      <!-- Displays the bar's information and address -->
       <form method='POST' action='dashboard.php'>
             <h1>Welcome <?php echo htmlentities($barName); ?></h1>
             <p>Your current address is: <?php echo htmlentities($address); ?> </p>
@@ -263,81 +256,154 @@
             <br><br>ZIP: <input type='text' name='zip' value="<?php echo htmlentities($zip); ?>" required>
             <br><br>Country: <input type='text' name='country' value="<?php echo htmlentities($country); ?>" required>
             <br><br><input type='submit' value='Update' name='update'>
-           </form>
-</html>
+       </form>
 
+      <!-- Displays the "Create Drink" form -->
+      <hr>
+      <form method =\'POST\' action=\'dashboard.php\'>
+        <h3>Create drink</h3>
+          Name of drink: <input type=\'text\' name=\'name\' required>
+          <br><br>Description: <input type=\'text\' name=\'desc\' required>
+          <br><br>Price: $<input type=\'number\' name=\'price\' step=\'.01\' required>
+          <br><br><input type=\'submit\' value=\'Add Drink\' name=\'addDrink\'>
+      </form>
+
+      <!-- Displays the "Create Event" form -->
+      <hr>
+      <form method=\'POST\' action=\'dashboard.php\'>
+        <h3>Create event</h3>
+        Name of event: <input type=\'text\' name=\'name\' required>
+        <br><br>Description: <input type=\'text\' name=\'desc\' size=\'80\' required>'
+        <br><br><input type=\'submit\' value=\'Add Event\' name=\'addEvent\'>'
+      </form>
+
+      <!-- Displays the "Remove Drink" form -->
+      <hr>
+      <form method=\'POST\' action=\'dashboard.php\'>
+        <h3>Remove Drink</h3>
+        Drinks: <select name=\'drink\' required>
+        <?php
+          $query = 'SELECT * FROM drink WHERE barid=\'' . $id . '\';';
+          $drinks = array();
+          $result = $db->query($query);
+          while ($drink = mysqli_fetch_array($result)) {
+            $drinks[] = $drink;
+          }
+          foreach($drinks as $d) {
+            echo '<option value=\'' . $d['id'] . '\'>' . $d['name'] . '</option>';
+          }
+        ?>
+        </select>
+        <br><br><input type=\'submit\' value=\'Remove Drink\' name=\'removeDrink\'>
+      </form>
+
+      <!-- Displays the "Remove Event" form -->
+      <hr>
+      <form method=\'POST\' action=\'dashboard.php\'>
+        <h3>Remove Event</h3>
+        Events: <select name=\'event\' required>
+        <?php
+          $query = 'SELECT * FROM event WHERE barid=\'' . $id . '\';';
+          $events = array();
+          $result = $db->query($query);
+          while($event = mysqli_fetch_array($result)) {
+            $events[] = $event;
+          }
+          foreach($events as $e) {
+            echo '<option value=\'' . $e['id'] . '\'>' . $e['name'] . '</option>';
+          }
+        ?>
+        </select>
+        <br><br><input type=\'submit\' value=\'Remove Event\' name=\'removeEvent\'>
+      </form>
+
+<!-- Function that displays a specified day in the calendar -->
 <?php
-
-      // ==============
-      // create a drink
-      // ==============
-      echo '<hr><form method =\'POST\' action=\'dashboard.php\'>' .
-            '<h3>Create drink</h3>' .
-            'Name of drink: <input type=\'text\' name=\'name\' required>' .
-            '<br><br>Description: <input type=\'text\' name=\'desc\' required>' .
-            '<br><br>Price: $<input type=\'number\' name=\'price\' step=\'.01\' required>' .
-            '<br><br><input type=\'submit\' value=\'Add Drink\' name=\'addDrink\'>' .
-            '</form>';
-
-
-      // ===============
-      // create an event
-      // ===============
-      echo '<hr><form method=\'POST\' action=\'dashboard.php\'>' .
-            '<h3>Create event</h3>';
-      echo  'Name of event: <input type=\'text\' name=\'name\' required>' .
-            '<br><br>Description: <input type=\'text\' name=\'desc\' size=\'80\' required>';
-      echo '<br><br><input type=\'submit\' value=\'Add Event\' name=\'addEvent\'>';
+  function displayCalendar($eid, $day, $db, $id, $events) {
+    // First, check to see if ther is an event on that day
+    if ($eid === NULL) {
+      // If not display the "Select Event" form
+      echo '<form method=\'POST\' action=\'dashboard.php\'>';
+      echo '<select name=\'event\' required>';
+      foreach ($events as $e) {
+        $abbr = substr($day, 0, 2);
+        echo '<option value=\'' . $abbr . ':' . $e['id'] . '\'>' . $e['name'] . '</option>';
+      }
+      echo '</select><br>';
+      echo '<input type=\'submit\' value=\'Select Event\' name=\'selectEvent\'>';
       echo '</form>';
-
-      // ==============
-      // Remove a drink
-      // ==============
-
-      echo '<hr><form method=\'POST\' action=\'dashboard.php\'>'.
-            '<h3>Remove Drink</h3>' .
-            'Drinks: <select name=\'drink\' required>';
-
-      $query = 'SELECT * FROM drink WHERE barid=\'' . $id . '\';';
-      $drinks = array();
+    } else {
+      // If there is an event, display it
+      $query = 'SELECT * FROM event WHERE id=' . $eid . ';';
       $result = $db->query($query);
-      while ($drink = mysqli_fetch_array($result)) {
-        $drinks[] = $drink;
-      }
-      foreach($drinks as $d) {
-        echo '<option value=\'' . $d['id'] . '\'>' . $d['name'] . '</option>';
-      }
-
-      echo '</select>' .
-            '<br><br><input type=\'submit\' value=\'Remove Drink\' name=\'removeDrink\'>';
-      echo '</form>';
-
-      // ===============
-      // Remove an event
-      // ===============
-
-      echo '<hr><form method=\'POST\' action=\'dashboard.php\'>' .
-            '<h3>Remove event</h3>' .
-            'Events: <select name=\'event\' required>';
-
-      $query = 'SELECT * FROM event WHERE barid=\'' . $id . '\';';
-      $events = array();
+      $event = mysqli_fetch_row($result);
+      echo 'Event: ' . $event[2] . '<br>';
+      echo 'Description: ' . $event[3] . '<br>';
+      $query = 'SELECT * FROM specialinfo where eventid=' . $eid . ';';
       $result = $db->query($query);
-      while($event = mysqli_fetch_array($result)) {
-        $events[] = $event;
+      if ($result == TRUE) {
+        $specials = array();
+        while ($special = mysqli_fetch_array($result)) {
+          $specials[] = $special;
+        }
+        echo '<hr><h4>Specials for this event</h4>';
+        // Display each special associated with this event (if there are any)
+        foreach ($specials as $s) {
+          $query = 'SELECT * FROM drink WHERE id=' . $s[2] . ';';
+          $result = $db->query($query);
+          if ($result == TRUE) {
+            $row = $result->fetch_assoc();
+            $did = $row['id'];
+            $query = 'SELECT * FROM specialinfo WHERE drinkid=' . $did . ';';
+            $result = $db->query($query);
+            $drink = $result->fetch_assoc();
+            echo 'Drink name: ' . $row['name'] . '<br>';
+            echo 'Drink descrption: ' . $row['description'] . '<br>';
+            echo 'Special price: $' . $drink['price'] . '<br><br>';
+            echo '<form method=\'POST\' action=\'dashboard.php\'>';
+            echo '<input type=\'hidden\' name=\'did\' value=\'' . $row['id'] .
+                    '\'>';
+            echo '<input type=\'hidden\' name=\'eid\' value=\'' . $s[1] . '\'>';
+            echo '<input type=\'submit\' value=\'Remove Special\' name=\'removeDrinkFromSpecial\'>';
+            echo '</form><br>';
+          } else {
+            'Failed to retrieve this drink :(<br>';
+          }
+        }
+      } else {
+        echo 'Failed to get specials associated with this event :(<br>';
       }
-      foreach($events as $e) {
-        echo '<option value=\'' . $e['id'] . '\'>' . $e['name'] . '</option>';
+      // Display the "Add Special" and "Remove Event" form
+      $query = 'SELECT * FROM drink WHERE barid=' . $id . ';';
+      $result = $db->query($query);
+      if ($result == TRUE) {
+        $drinks = array();
+        while ($drink = mysqli_fetch_array($result)) {
+          $drinks[] = $drink;
+        }
+        echo '<hr><h4>Add a drink special to this event:</h4>';
+        echo '<form method=\'POST\' action=\'dashboard.php\'>';
+        echo 'Drinks: <select name=\'did\' required>';
+        foreach ($drinks as $d) {
+          echo '<option value=\'' . $d['id'] . '\'>' . $d['name'] . '</option>';
+        }
+        echo '</select><br>';
+        echo 'Price: $<input type=\'number\' name=\'price\' step=\'.01\' required>';
+        echo '<input type=\'hidden\' name=\'eid\' value=\'' . $eid . '\'>';
+        echo '<br><input type=\'submit\' value=\'Add Special\' name=\'addSpecial\'>';
+        echo '</form>';
+        echo '<hr><form method=\'POST\' action=\'dashboard.php\'>';
+        echo '<input type=\'hidden\' name=\'day\' value=\'' . $day . '\'>';
+        echo '<input type=\'submit\' name=\'removeEventFromDay\' value =\'Remove Event\'>';
+        echo '</form>';
+      } else {
+        echo 'Could not load drinks for the schedule :(<br>';
       }
-
-      echo '</select>' .
-            '<br><br><input type=\'submit\' value=\'Remove Event\' name=\'removeEvent\'>';
-      echo '</form>';
-
+    }
+  }
 ?>
 
-<!-- Weekly Calendar -->
-<html>
+  <!-- HTML to display the calendar -->
   <hr>
   <h3>Weekly Calendar</h3>
   <table border='1'>
@@ -382,520 +448,37 @@
     <tr>
       <td><!-- Sunday -->
         <?php
-          if ($sunID === NULL) {
-            echo '<form method=\'POST\' action=\'dashboard.php\'>';
-            echo '<select name=\'event\' required>';
-            foreach ($events as $e) {
-              echo '<option value=\'su:' . $e['id'] . '\'>' . $e['name'] . '</option>';
-            }
-            echo '</select><br>';
-            echo '<input type=\'submit\' value=\'Select Event\' name=\'selectEvent\'>';
-            echo '</form>';
-          } else {
-            $query = 'SELECT * FROM event WHERE id=' . $sunID . ';';
-            $result = $db->query($query);
-            $event = mysqli_fetch_row($result);
-            echo 'Event: ' . $event[2] . '<br>';
-            echo 'Description: ' . $event[3] . '<br>';
-            $query = 'SELECT * FROM specialinfo where eventid=' . $sunID . ';';
-            $result = $db->query($query);
-            if ($result == TRUE) {
-              $specials = array();
-              while ($special = mysqli_fetch_array($result)) {
-                $specials[] = $special;
-              }
-              echo '<hr><h4>Specials for this event</h4>';
-              foreach ($specials as $s) {
-                $query = 'SELECT * FROM drink WHERE id=' . $s[2] . ';';
-                $result = $db->query($query);
-                if ($result == TRUE) {
-                  $row = $result->fetch_assoc();
-                  echo 'Drink name: ' . $row['name'] . '<br>';
-                  echo 'Drink descrption: ' . $row['description'] . '<br>';
-                  echo 'Special price: $' . $row['price'] . '<br><br>';
-                  echo '<form method=\'POST\' action=\'dashboard.php\'>';
-                  echo '<input type=\'hidden\' name=\'did\' value=\'' . $row['id'] .
-                          '\'>';
-                  echo '<input type=\'hidden\' name=\'eid\' value=\'' . $s[1] . '\'>';
-                  echo '<input type=\'submit\' value=\'Remove Special\' name=\'removeDrinkFromSpecial\'>';
-                  echo '</form><br>';
-                } else {
-                  'Failed to retrieve this drink :(<br>';
-                }
-              }
-            } else {
-              echo 'Failed to get specials associated with this event :(<br>';
-            }
-            $query = 'SELECT * FROM drink WHERE barid=' . $id . ';';
-            $result = $db->query($query);
-            if ($result == TRUE) {
-              $drinks = array();
-              while ($drink = mysqli_fetch_array($result)) {
-                $drinks[] = $drink;
-              }
-              echo '<hr><h4>Add a drink special to this event:</h4>';
-              echo '<form method=\'POST\' action=\'dashboard.php\'>';
-              echo 'Drinks: <select name=\'did\' required>';
-              foreach ($drinks as $d) {
-                echo '<option value=\'' . $d['id'] . '\'>' . $d['name'] . '</option>';
-              }
-              echo '</select><br>';
-              echo 'Price: $<input type=\'number\' name=\'price\' step=\'.01\' required>';
-              echo '<input type=\'hidden\' name=\'eid\' value=\'' . $sunID . '\'>';
-              echo '<br><input type=\'submit\' value=\'Add Special\' name=\'addSpecial\'>';
-              echo '</form>';
-              echo '<hr><form method=\'POST\' action=\'dashboard.php\'>';
-              echo '<input type=\'hidden\' name=\'day\' value=\'sunday\'>';
-              echo '<input type=\'submit\' name=\'removeEventFromDay\' value =\'Remove Event\'>';
-              echo '</form>';
-            } else {
-              echo 'Could not load drinks for the schedule :(<br>';
-            }
-          }
+          displayCalendar($sunID, "sunday", $db, $id, $events);
         ?>
       </td>
       <td><!-- Monday -->
         <?php
-          if ($monID === NULL) {
-            echo '<form method=\'POST\' action=\'dashboard.php\'>';
-            echo '<select name=\'event\' required>';
-            foreach ($events as $e) {
-              echo '<option value=\'mo:' . $e['id'] . '\'>' . $e['name'] . '</option>';
-            }
-            echo '</select><br>';
-            echo '<input type=\'submit\' value=\'Select Event\' name=\'selectEvent\'>';
-            echo '</form>';
-          } else {
-            $query = 'SELECT * FROM event WHERE id=' . $monID . ';';
-            $result = $db->query($query);
-            $event = mysqli_fetch_row($result);
-            echo 'Event: ' . $event[2] . '<br>';
-            echo 'Description: ' . $event[3] . '<br>';
-            $query = 'SELECT * FROM specialinfo where eventid=' . $monID . ';';
-            $result = $db->query($query);
-            if ($result == TRUE) {
-              $specials = array();
-              while ($special = mysqli_fetch_array($result)) {
-                $specials[] = $special;
-              }
-              echo '<hr><h4>Specials for this event</h4>';
-              foreach ($specials as $s) {
-                $query = 'SELECT * FROM drink WHERE id=' . $s[2] . ';';
-                $result = $db->query($query);
-                if ($result == TRUE) {
-                  $row = $result->fetch_assoc();
-                  echo 'Drink name: ' . $row['name'] . '<br>';
-                  echo 'Drink descrption: ' . $row['description'] . '<br>';
-                  echo 'Special price: $' . $row['price'] . '<br><br>';
-                  echo '<form method=\'POST\' action=\'dashboard.php\'>';
-                  echo '<input type=\'hidden\' name=\'did\' value=\'' . $row['id'] .
-                          '\'>';
-                  echo '<input type=\'hidden\' name=\'eid\' value=\'' . $s[1] . '\'>';
-                  echo '<input type=\'submit\' value=\'Remove Special\' name=\'removeDrinkFromSpecial\'>';
-                  echo '</form><br>';
-                } else {
-                  'Failed to retrieve this drink :(<br>';
-                }
-              }
-            } else {
-              echo 'Failed to get specials associated with this event :(<br>';
-            }
-            $query = 'SELECT * FROM drink WHERE barid=' . $id . ';';
-            $result = $db->query($query);
-            if ($result == TRUE) {
-              $drinks = array();
-              while ($drink = mysqli_fetch_array($result)) {
-                $drinks[] = $drink;
-              }
-              echo '<hr><h4>Add a drink special to this event:</h4>';
-              echo '<form method=\'POST\' action=\'dashboard.php\'>';
-              echo 'Drinks: <select name=\'did\' required>';
-              foreach ($drinks as $d) {
-                echo '<option value=\'' . $d['id'] . '\'>' . $d['name'] . '</option>';
-              }
-              echo '</select><br>';
-              echo 'Price: $<input type=\'number\' name=\'price\' step=\'.01\' required>';
-              echo '<input type=\'hidden\' name=\'eid\' value=\'' . $monID . '\'>';
-              echo '<br><input type=\'submit\' value=\'Add Special\' name=\'addSpecial\'>';
-              echo '</form>';
-              echo '<hr><form method=\'POST\' action=\'dashboard.php\'>';
-              echo '<input type=\'hidden\' name=\'day\' value=\'monday\'>';
-              echo '<input type=\'submit\' name=\'removeEventFromDay\' value =\'Remove Event\'>';
-              echo '</form>';
-            } else {
-              echo 'Could not load drinks for the schedule :(<br>';
-            }
-          }
+          displayCalendar($monID, "monday", $db, $id, $events);
         ?>
       </td>
       <td><!-- Tuesday -->
         <?php
-          if ($tuesID === NULL) {
-            echo '<form method=\'POST\' action=\'dashboard.php\'>';
-            echo '<select name=\'event\' required>';
-            foreach ($events as $e) {
-              echo '<option value=\'tu:' . $e['id'] . '\'>' . $e['name'] . '</option>';
-            }
-            echo '</select><br>';
-            echo '<input type=\'submit\' value=\'Select Event\' name=\'selectEvent\'>';
-            echo '</form>';
-          } else {
-            $query = 'SELECT * FROM event WHERE id=' . $tuesID . ';';
-            $result = $db->query($query);
-            $event = mysqli_fetch_row($result);
-            echo 'Event: ' . $event[2] . '<br>';
-            echo 'Description: ' . $event[3] . '<br>';
-            $query = 'SELECT * FROM specialinfo where eventid=' . $tuesID . ';';
-            $result = $db->query($query);
-            if ($result == TRUE) {
-              $specials = array();
-              while ($special = mysqli_fetch_array($result)) {
-                $specials[] = $special;
-              }
-              echo '<hr><h4>Specials for this event</h4>';
-              foreach ($specials as $s) {
-                $query = 'SELECT * FROM drink WHERE id=' . $s[2] . ';';
-                $result = $db->query($query);
-                if ($result == TRUE) {
-                  $row = $result->fetch_assoc();
-                  echo 'Drink name: ' . $row['name'] . '<br>';
-                  echo 'Drink descrption: ' . $row['description'] . '<br>';
-                  echo 'Special price: $' . $row['price'] . '<br><br>';
-                  echo '<form method=\'POST\' action=\'dashboard.php\'>';
-                  echo '<input type=\'hidden\' name=\'did\' value=\'' . $row['id'] .
-                          '\'>';
-                  echo '<input type=\'hidden\' name=\'eid\' value=\'' . $s[1] . '\'>';
-                  echo '<input type=\'submit\' value=\'Remove Special\' name=\'removeDrinkFromSpecial\'>';
-                  echo '</form><br>';
-                } else {
-                  'Failed to retrieve this drink :(<br>';
-                }
-              }
-            } else {
-              echo 'Failed to get specials associated with this event :(<br>';
-            }
-            $query = 'SELECT * FROM drink WHERE barid=' . $id . ';';
-            $result = $db->query($query);
-            if ($result == TRUE) {
-              $drinks = array();
-              while ($drink = mysqli_fetch_array($result)) {
-                $drinks[] = $drink;
-              }
-              echo '<hr><h4>Add a drink special to this event:</h4>';
-              echo '<form method=\'POST\' action=\'dashboard.php\'>';
-              echo 'Drinks: <select name=\'did\' required>';
-              foreach ($drinks as $d) {
-                echo '<option value=\'' . $d['id'] . '\'>' . $d['name'] . '</option>';
-              }
-              echo '</select><br>';
-              echo 'Price: $<input type=\'number\' name=\'price\' step=\'.01\' required>';
-              echo '<input type=\'hidden\' name=\'eid\' value=\'' . $tuesID . '\'>';
-              echo '<br><input type=\'submit\' value=\'Add Special\' name=\'addSpecial\'>';
-              echo '</form>';
-              echo '<hr><form method=\'POST\' action=\'dashboard.php\'>';
-              echo '<input type=\'hidden\' name=\'day\' value=\'tuesday\'>';
-              echo '<input type=\'submit\' name=\'removeEventFromDay\' value =\'Remove Event\'>';
-              echo '</form>';
-            } else {
-              echo 'Could not load drinks for the schedule :(<br>';
-            }
-          }
+          displayCalendar($tuesID, "tuesday", $db, $id, $events);
         ?>
       </td>
       <td><!-- Wednesday -->
         <?php
-          if ($wedID === NULL) {
-            echo '<form method=\'POST\' action=\'dashboard.php\'>';
-            echo '<select name=\'event\' required>';
-            foreach ($events as $e) {
-              echo '<option value=\'we:' . $e['id'] . '\'>' . $e['name'] . '</option>';
-            }
-            echo '</select><br>';
-            echo '<input type=\'submit\' value=\'Select Event\' name=\'selectEvent\'>';
-            echo '</form>';
-          } else {
-            $query = 'SELECT * FROM event WHERE id=' . $wedID . ';';
-            $result = $db->query($query);
-            $event = mysqli_fetch_row($result);
-            echo 'Event: ' . $event[2] . '<br>';
-            echo 'Description: ' . $event[3] . '<br>';
-            $query = 'SELECT * FROM specialinfo where eventid=' . $wedID . ';';
-            $result = $db->query($query);
-            if ($result == TRUE) {
-              $specials = array();
-              while ($special = mysqli_fetch_array($result)) {
-                $specials[] = $special;
-              }
-              echo '<hr><h4>Specials for this event</h4>';
-              foreach ($specials as $s) {
-                $query = 'SELECT * FROM drink WHERE id=' . $s[2] . ';';
-                $result = $db->query($query);
-                if ($result == TRUE) {
-                  $row = $result->fetch_assoc();
-                  echo 'Drink name: ' . $row['name'] . '<br>';
-                  echo 'Drink descrption: ' . $row['description'] . '<br>';
-                  echo 'Special price: $' . $row['price'] . '<br><br>';
-                  echo '<form method=\'POST\' action=\'dashboard.php\'>';
-                  echo '<input type=\'hidden\' name=\'did\' value=\'' . $row['id'] .
-                          '\'>';
-                  echo '<input type=\'hidden\' name=\'eid\' value=\'' . $s[1] . '\'>';
-                  echo '<input type=\'submit\' value=\'Remove Special\' name=\'removeDrinkFromSpecial\'>';
-                  echo '</form><br>';
-                } else {
-                  'Failed to retrieve this drink :(<br>';
-                }
-              }
-            } else {
-              echo 'Failed to get specials associated with this event :(<br>';
-            }
-            $query = 'SELECT * FROM drink WHERE barid=' . $id . ';';
-            $result = $db->query($query);
-            if ($result == TRUE) {
-              $drinks = array();
-              while ($drink = mysqli_fetch_array($result)) {
-                $drinks[] = $drink;
-              }
-              echo '<hr><h4>Add a drink special to this event:</h4>';
-              echo '<form method=\'POST\' action=\'dashboard.php\'>';
-              echo 'Drinks: <select name=\'did\' required>';
-              foreach ($drinks as $d) {
-                echo '<option value=\'' . $d['id'] . '\'>' . $d['name'] . '</option>';
-              }
-              echo '</select><br>';
-              echo 'Price: $<input type=\'number\' name=\'price\' step=\'.01\' required>';
-              echo '<input type=\'hidden\' name=\'eid\' value=\'' . $wedID . '\'>';
-              echo '<br><input type=\'submit\' value=\'Add Special\' name=\'addSpecial\'>';
-              echo '</form>';
-              echo '<hr><form method=\'POST\' action=\'dashboard.php\'>';
-              echo '<input type=\'hidden\' name=\'day\' value=\'wednesday\'>';
-              echo '<input type=\'submit\' name=\'removeEventFromDay\' value =\'Remove Event\'>';
-              echo '</form>';
-            } else {
-              echo 'Could not load drinks for the schedule :(<br>';
-            }
-          }
+          displayCalendar($wedID, "wednesday", $db, $id, $events);
         ?>
       </td>
       <td><!-- Thursday -->
         <?php
-          if ($thuID === NULL) {
-            echo '<form method=\'POST\' action=\'dashboard.php\'>';
-            echo '<select name=\'event\' required>';
-            foreach ($events as $e) {
-              echo '<option value=\'th:' . $e['id'] . '\'>' . $e['name'] . '</option>';
-            }
-            echo '</select><br>';
-            echo '<input type=\'submit\' value=\'Select Event\' name=\'selectEvent\'>';
-            echo '</form>';
-          } else {
-            $query = 'SELECT * FROM event WHERE id=' . $thuID . ';';
-            $result = $db->query($query);
-            $event = mysqli_fetch_row($result);
-            echo 'Event: ' . $event[2] . '<br>';
-            echo 'Description: ' . $event[3] . '<br>';
-            $query = 'SELECT * FROM specialinfo where eventid=' . $thuID . ';';
-            $result = $db->query($query);
-            if ($result == TRUE) {
-              $specials = array();
-              while ($special = mysqli_fetch_array($result)) {
-                $specials[] = $special;
-              }
-              echo '<hr><h4>Specials for this event</h4>';
-              foreach ($specials as $s) {
-                $query = 'SELECT * FROM drink WHERE id=' . $s[2] . ';';
-                $result = $db->query($query);
-                if ($result == TRUE) {
-                  $row = $result->fetch_assoc();
-                  echo 'Drink name: ' . $row['name'] . '<br>';
-                  echo 'Drink descrption: ' . $row['description'] . '<br>';
-                  echo 'Special price: $' . $row['price'] . '<br><br>';
-                  echo '<form method=\'POST\' action=\'dashboard.php\'>';
-                  echo '<input type=\'hidden\' name=\'did\' value=\'' . $row['id'] .
-                          '\'>';
-                  echo '<input type=\'hidden\' name=\'eid\' value=\'' . $s[1] . '\'>';
-                  echo '<input type=\'submit\' value=\'Remove Special\' name=\'removeDrinkFromSpecial\'>';
-                  echo '</form><br>';
-                } else {
-                  'Failed to retrieve this drink :(<br>';
-                }
-              }
-            } else {
-              echo 'Failed to get specials associated with this event :(<br>';
-            }
-            $query = 'SELECT * FROM drink WHERE barid=' . $id . ';';
-            $result = $db->query($query);
-            if ($result == TRUE) {
-              $drinks = array();
-              while ($drink = mysqli_fetch_array($result)) {
-                $drinks[] = $drink;
-              }
-              echo '<hr><h4>Add a drink special to this event:</h4>';
-              echo '<form method=\'POST\' action=\'dashboard.php\'>';
-              echo 'Drinks: <select name=\'did\' required>';
-              foreach ($drinks as $d) {
-                echo '<option value=\'' . $d['id'] . '\'>' . $d['name'] . '</option>';
-              }
-              echo '</select><br>';
-              echo 'Price: $<input type=\'number\' name=\'price\' step=\'.01\' required>';
-              echo '<input type=\'hidden\' name=\'eid\' value=\'' . $thuID . '\'>';
-              echo '<br><input type=\'submit\' value=\'Add Special\' name=\'addSpecial\'>';
-              echo '</form>';
-              echo '<hr><form method=\'POST\' action=\'dashboard.php\'>';
-              echo '<input type=\'hidden\' name=\'day\' value=\'thursday\'>';
-              echo '<input type=\'submit\' name=\'removeEventFromDay\' value =\'Remove Event\'>';
-              echo '</form>';
-            } else {
-              echo 'Could not load drinks for the schedule :(<br>';
-            }
-          }
+          displayCalendar($thuID, "thursday", $db, $id, $events);
         ?>
       </td>
       <td><!-- Friday -->
         <?php
-          if ($friID === NULL) {
-            echo '<form method=\'POST\' action=\'dashboard.php\'>';
-            echo '<select name=\'event\' required>';
-            foreach ($events as $e) {
-              echo '<option value=\'fr:' . $e['id'] . '\'>' . $e['name'] . '</option>';
-            }
-            echo '</select><br>';
-            echo '<input type=\'submit\' value=\'Select Event\' name=\'selectEvent\'>';
-            echo '</form>';
-          } else {
-            $query = 'SELECT * FROM event WHERE id=' . $friID . ';';
-            $result = $db->query($query);
-            $event = mysqli_fetch_row($result);
-            echo 'Event: ' . $event[2] . '<br>';
-            echo 'Description: ' . $event[3] . '<br>';
-            $query = 'SELECT * FROM specialinfo where eventid=' . $friID . ';';
-            $result = $db->query($query);
-            if ($result == TRUE) {
-              $specials = array();
-              while ($special = mysqli_fetch_array($result)) {
-                $specials[] = $special;
-              }
-              echo '<hr><h4>Specials for this event</h4>';
-              foreach ($specials as $s) {
-                $query = 'SELECT * FROM drink WHERE id=' . $s[2] . ';';
-                $result = $db->query($query);
-                if ($result == TRUE) {
-                  $row = $result->fetch_assoc();
-                  echo 'Drink name: ' . $row['name'] . '<br>';
-                  echo 'Drink descrption: ' . $row['description'] . '<br>';
-                  echo 'Special price: $' . $row['price'] . '<br><br>';
-                  echo '<form method=\'POST\' action=\'dashboard.php\'>';
-                  echo '<input type=\'hidden\' name=\'did\' value=\'' . $row['id'] .
-                          '\'>';
-                  echo '<input type=\'hidden\' name=\'eid\' value=\'' . $s[1] . '\'>';
-                  echo '<input type=\'submit\' value=\'Remove Special\' name=\'removeDrinkFromSpecial\'>';
-                  echo '</form><br>';
-                } else {
-                  'Failed to retrieve this drink :(<br>';
-                }
-              }
-            } else {
-              echo 'Failed to get specials associated with this event :(<br>';
-            }
-            $query = 'SELECT * FROM drink WHERE barid=' . $id . ';';
-            $result = $db->query($query);
-            if ($result == TRUE) {
-              $drinks = array();
-              while ($drink = mysqli_fetch_array($result)) {
-                $drinks[] = $drink;
-              }
-              echo '<hr><h4>Add a drink special to this event:</h4>';
-              echo '<form method=\'POST\' action=\'dashboard.php\'>';
-              echo 'Drinks: <select name=\'did\' required>';
-              foreach ($drinks as $d) {
-                echo '<option value=\'' . $d['id'] . '\'>' . $d['name'] . '</option>';
-              }
-              echo '</select><br>';
-              echo 'Price: $<input type=\'number\' name=\'price\' step=\'.01\' required>';
-              echo '<input type=\'hidden\' name=\'eid\' value=\'' . $friID . '\'>';
-              echo '<br><input type=\'submit\' value=\'Add Special\' name=\'addSpecial\'>';
-              echo '</form>';
-              echo '<hr><form method=\'POST\' action=\'dashboard.php\'>';
-              echo '<input type=\'hidden\' name=\'day\' value=\'friday\'>';
-              echo '<input type=\'submit\' name=\'removeEventFromDay\' value =\'Remove Event\'>';
-              echo '</form>';
-            } else {
-              echo 'Could not load drinks for the schedule :(<br>';
-            }
-          }
+          displayCalendar($friID, "friday", $db, $id, $events);
         ?>
       </td>
       <td><!-- Saturday -->
         <?php
-          if ($satID === NULL) {
-            echo '<form method=\'POST\' action=\'dashboard.php\'>';
-            echo '<select name=\'event\' required>';
-            foreach ($events as $e) {
-              echo '<option value=\'sa:' . $e['id'] . '\'>' . $e['name'] . '</option>';
-            }
-            echo '</select><br>';
-            echo '<input type=\'submit\' value=\'Select Event\' name=\'selectEvent\'>';
-            echo '</form>';
-          } else {
-            $query = 'SELECT * FROM event WHERE id=' . $satID . ';';
-            $result = $db->query($query);
-            $event = mysqli_fetch_row($result);
-            echo 'Event: ' . $event[2] . '<br>';
-            echo 'Description: ' . $event[3] . '<br>';
-            $query = 'SELECT * FROM specialinfo where eventid=' . $satID . ';';
-            $result = $db->query($query);
-            if ($result == TRUE) {
-              $specials = array();
-              while ($special = mysqli_fetch_array($result)) {
-                $specials[] = $special;
-              }
-              echo '<hr><h4>Specials for this event</h4>';
-              foreach ($specials as $s) {
-                $query = 'SELECT * FROM drink WHERE id=' . $s[2] . ';';
-                $result = $db->query($query);
-                if ($result == TRUE) {
-                  $row = $result->fetch_assoc();
-                  echo 'Drink name: ' . $row['name'] . '<br>';
-                  echo 'Drink descrption: ' . $row['description'] . '<br>';
-                  echo 'Special price: $' . $row['price'] . '<br>';
-                  echo '<form method=\'POST\' action=\'dashboard.php\'>';
-                  echo '<input type=\'hidden\' name=\'did\' value=\'' . $row['id'] .
-                          '\'>';
-                  echo '<input type=\'hidden\' name=\'eid\' value=\'' . $s[1] . '\'>';
-                  echo '<input type=\'submit\' value=\'Remove Special\' name=\'removeDrinkFromSpecial\'>';
-                  echo '</form><br>';
-                } else {
-                  'Failed to retrieve this drink :(<br>';
-                }
-              }
-            } else {
-              echo 'Failed to get specials associated with this event :(<br>';
-            }
-            $query = 'SELECT * FROM drink WHERE barid=' . $id . ';';
-            $result = $db->query($query);
-            if ($result == TRUE) {
-              $drinks = array();
-              while ($drink = mysqli_fetch_array($result)) {
-                $drinks[] = $drink;
-              }
-              echo '<hr><h4>Add a drink special to this event:</h4>';
-              echo '<form method=\'POST\' action=\'dashboard.php\'>';
-              echo 'Drinks: <select name=\'did\' required>';
-              foreach ($drinks as $d) {
-                echo '<option value=\'' . $d['id'] . '\'>' . $d['name'] . '</option>';
-              }
-              echo '</select><br>';
-              echo 'Price: $<input type=\'number\' name=\'price\' step=\'.01\' required>';
-              echo '<input type=\'hidden\' name=\'eid\' value=\'' . $satID . '\'>';
-              echo '<br><input type=\'submit\' value=\'Add Special\' name=\'addSpecial\'>';
-              echo '</form>';
-              echo '<hr><form method=\'POST\' action=\'dashboard.php\'>';
-              echo '<input type=\'hidden\' name=\'day\' value=\'saturday\'>';
-              echo '<input type=\'submit\' name=\'removeEventFromDay\' value =\'Remove Event\'>';
-              echo '</form>';
-            } else {
-              echo 'Could not load drinks for the schedule :(<br>';
-            }
-          }
+          displayCalendar($satID, "saturday", $db, $id, $events);
         ?>
       </td>
   </table>
