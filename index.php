@@ -136,7 +136,7 @@ echo <<<FORMINCORECT
         </div>
         <br>
         <br>
-        <input type="submit" value="Submit" class="btn btn-default">
+        <input type="submit" value="Logiin" class="btn btn-default">
       </form>
     </center>
 
@@ -173,7 +173,7 @@ echo <<<FORMEMPTY
         </div>
         <br>
         <br>
-        <input type="submit" value="Submit" class="btn btn-default">
+        <input type="submit" value="Login" class="btn btn-default">
       </form>
     </center>
 
@@ -222,7 +222,7 @@ echo <<<FORM
         </div>
         <br>
         <br>
-        <input type="submit" value="Submit" class="btn btn-default">
+        <input type="submit" value="Login" class="btn btn-default">
       </form>
     </center>
 
