@@ -113,6 +113,7 @@ else
 echo <<<FORMINCORECT
 
 <center>
+  <div class="container">
       <img src="img/logo.png">
       <h2>Admin Sign-In</h2>
       <div class="titlebar"><h4 class="titlebarheader">Login Failed</h4></div>
@@ -138,7 +139,8 @@ echo <<<FORMINCORECT
         <br>
         <input type="submit" value="Logiin" class="btn btn-default">
       </form>
-    </center>
+  </div>
+</center>
 
 </div>
 FORMINCORECT;
@@ -150,6 +152,7 @@ else
   // Form if field(s) left empty re-display login information
 echo <<<FORMEMPTY
 <center>
+    <div class="container">
       <img src="img/logo.png">
       <h2>Admin Sign-In</h2>
       <div class="titlebar"><h4 class="titlebarheader">Login Failed</h4></div>
@@ -175,7 +178,8 @@ echo <<<FORMEMPTY
         <br>
         <input type="submit" value="Login" class="btn btn-default">
       </form>
-    </center>
+    </div>
+</center>
 
 </div>
 FORMEMPTY;
@@ -202,6 +206,7 @@ else
 echo <<<FORM
 
     <center>
+     <div class="container">
       <img src="img/logo.png">
       <h2>Admin Sign-In</h2>
       <form action="index.php?login=true" method="post" >
@@ -224,6 +229,7 @@ echo <<<FORM
         <br>
         <input type="submit" value="Login" class="btn btn-default">
       </form>
+     </div>
     </center>
 
 
