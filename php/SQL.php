@@ -138,4 +138,40 @@ function setSeshInfo($sesh, $sip, $barid)
 	//return $returnValue["id"];
 }
 
+/*
+ * getAllBarIds takes VOID
+ * 		all bar ids are selected from bar table
+ *		returns array of bar ids
+ */
+function getAllBarIds(){
+	if ($TRACE) {
+		echo "TRACE: getting bar ids..<br>";
+	}
+
+	global $fdbName, $fdbLocation, $fdbUsername, $fdbPassword;
+	
+
+	// create connection
+	global $servername, $DB_username, $DB_password, $defaultdb, $port;
+
+
+	$db = mysqli_connect($servername, $DB_username, $DB_password, $defaultdb, $port);
+	if (mysqli_connect_errno()) {
+		echo "Failed to connect to MySQL: " . mysql_connect_error();
+	}
+
+	// check the connection
+	if ($db->connect_error){
+		echo "DEBUG: BAD! ERROR CONNECTING TO DB!<br>";
+		die("connection failed: " . $db->connect_error);
+	}
+
+
+	$sql = "SELECT id FROM 'bars' WHERE 1";
+	$result = $db->query($sql);
+
+
+	return $result;
+}
+
 ?>
