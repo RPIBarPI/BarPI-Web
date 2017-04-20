@@ -7,7 +7,7 @@
 require_once('SQL.php');
 
 
-$TRACE = 0; // for debugging print statements
+$TRACE = 1; // for debugging print statements
 
 // get all the bar ids
 $bar_ids = getAllBarIds();
@@ -15,9 +15,16 @@ $bar_ids = getAllBarIds();
 // get todays day (only next day if past 5am NOT midnight)
 $today = getTodaysDay();
 
+if ($TRACE)
+	echo "num bar ids found ==".count($bar_ids)."<br>";
+
+
 // loop over all bars and set as appropriate
 for ($i=0; $i < count($bar_ids); $i++){
 	updateTodaysSelection($bar_ids[$i], $today);
+
+	if ($TRACE==1)
+		echo "i==".$i."<br>";
 }
 
 
@@ -32,7 +39,7 @@ function updateTodaysSelection($barid, $today)
 		echo "TRACE: updating selection for barid=" . $barid . " and day =='".$today."'";
 	}
 
-	global $fdbName, $fdbLocation, $fdbUsername, $fdbPassword;
+	global $fdbName, $fdbLocation, $fdbUsername, $fdbPassword, $TRACE;
 	
 
 	// create connection
@@ -61,16 +68,55 @@ function updateTodaysSelection($barid, $today)
 
 
 	// this is just starter code..
-	$sql = "SELECT id FROM 'bars' WHERE 1";
-	$result = $db->query($sql);
+	//$sql = "SELECT id FROM 'bars' WHERE 1";
+	//$result = $db->query($sql);
 
-	
+
+
+	mysqli_close($db);
+
 
 }
 
 function getTodaysDay(){
+	global $TRACE;
 
+	date_default_timezone_set("America/New_York");
 
+	// get day of week
+	$dayNum = getdate();
+	$dayNum = $dayNum['wday'];
+	$dayStr="ERORR! day not found";
+
+	if ($TRACE==1)
+		echo "<br><br> dayNum== ".$dayNum."<br><br>";
+
+	if ($dayNum == 0){
+		$dayStr="sunday";
+	}
+	else if ($dayNum == 1) {
+		$dayStr="monday";
+	}
+	else if ($dayNum == 2) {
+		$dayStr="tuesday";
+	}
+	else if ($dayNum == 3) {
+		$dayStr="wednesday";
+	}
+	else if ($dayNum == 4){
+		$dayStr="thursday";
+	}
+	else if ($dayNum == 5) {
+		$dayStr="friday";
+	}
+	else if ($dayNum == 6) {
+		$dayStr="saturday";
+	}
+
+	if ($TRACE==1)
+		echo "day of week is:" .  $dayStr. " dayname() == ". date('l');
+	
+	return $dayStr;
 }
 
 

@@ -167,9 +167,17 @@ function getAllBarIds(){
 	}
 
 
-	$sql = "SELECT id FROM 'bars' WHERE 1";
+	$sql = "SELECT id FROM bars WHERE 1";
 	$result = $db->query($sql);
 
+	//echo "SQL: resutl->numRows:".$result->num_rows."<br>";
+	$result = $result->fetch_all(MYSQLI_BOTH);
+	
+	//echo "SQL: return val=".$result."<br>";
+	//echo "SQL: size of ids == ".count($result)."<br>";
+
+
+	mysqli_close($db);
 
 	return $result;
 }
