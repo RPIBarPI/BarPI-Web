@@ -6,7 +6,7 @@
 
   $TRACE = 0; // for debugging print statements
 
-  
+
   // check if logging out
   if (isset($_POST['Logout'])){
     $_SESSION['id']=NULL;
@@ -149,8 +149,14 @@
         }
         // In addition, you must also remove any entries from the specialinfo table
         //  associated with the drink being removed
-        $query = 'DELETE * FROM specialinfo WHERE drinkid=' . $did . ';';
-        $db->query($query);
+        $query = 'DELETE FROM specialinfo WHERE drinkid=' . $did . ';';
+        $result = $db->query($query);
+        if ($result == TRUE) {
+          echo 'Drink special deleted!<br>';
+        } else {
+          echo 'Drink special not deleted<br>';
+          echo $db->error . '<br>';
+        }
       }
 
       // Called when the "Remove Event" button is clicked
@@ -186,7 +192,7 @@
         $db->query($query);
         $query = 'UPDATE barCalendar SET saturday = NULL WHERE saturday =' . $eid . ';';
         $db->query($query);
-        $query = 'DELETE * FROM specialinfo WHERE eventid=' . $eid . ';';
+        $query = 'DELETE FROM specialinfo WHERE eventid=' . $eid . ';';
         $db->query($query);
       }
 
