@@ -22,7 +22,7 @@ function checkPassword($cUsername, $cPassword)
 	}
 
 	global $fdbName, $fdbLocation, $fdbUsername, $fdbPassword;
-	
+
 	// md5 password
 	$cPassword=md5($cPassword);
 
@@ -103,7 +103,7 @@ function deleteOldSesh($sesh)
 function setSeshInfo($sesh, $sip, $barid)
 {
 	global $servername, $DB_username, $DB_password, $defaultdb, $port;
-	
+
 
 	$db = mysqli_connect($servername, $DB_username, $DB_password, $defaultdb, $port);
 
@@ -123,7 +123,7 @@ function setSeshInfo($sesh, $sip, $barid)
 	$barid=mysqli_real_escape_string($db, $barid);
 
 	$sql = "INSERT INTO sessions (sid, ip, barid) VALUES('$sesh', '$sip', $barid)";
-	
+
 	echo "TRACE:  INSERT INTO sessions (sid, ip, barid) VALUES('$sesh', '$sip', $barid)<br>";
 
 	if ($result = $db->query($sql) === TRUE){
@@ -149,7 +149,7 @@ function getAllBarIds(){
 	}
 
 	global $fdbName, $fdbLocation, $fdbUsername, $fdbPassword;
-	
+
 
 	// create connection
 	global $servername, $DB_username, $DB_password, $defaultdb, $port;
@@ -172,7 +172,7 @@ function getAllBarIds(){
 
 	//echo "SQL: resutl->numRows:".$result->num_rows."<br>";
 	$result = $result->fetch_all(MYSQLI_BOTH);
-	
+
 	//echo "SQL: return val=".$result."<br>";
 	//echo "SQL: size of ids == ".count($result)."<br>";
 
