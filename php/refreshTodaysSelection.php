@@ -21,7 +21,8 @@ if ($TRACE)
 
 // loop over all bars and set as appropriate
 for ($i=0; $i < count($bar_ids); $i++){
-	updateTodaysSelection($bar_ids[$i][0], $today);
+  //echo "----- id==".$bar_ids[$i]['id']."-----<br>";
+	updateTodaysSelection($bar_ids[$i]['id'], $today);
 
 	if ($TRACE==1)
 		echo "i==".$i."<br>";
