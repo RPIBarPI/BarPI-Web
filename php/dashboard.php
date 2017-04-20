@@ -179,7 +179,7 @@
 
           // update what will be displayed to app users
           updateTodaysSelection($id, getTodaysDay() );
-          
+
           if ($TRACE){
             echo "TRACE: Tried query:$query<br>\tsuccessfully deleted event!, return value: $result!<br>";
           }
@@ -257,6 +257,9 @@
                   $eid . '\', \'' . $did . '\', \'' .
                   mysqli_real_escape_string($db, $price) . '\');';
         $result = $db->query($query);
+
+        // update what will be displayed to app users
+        updateTodaysSelection($id, getTodaysDay() );
       }
 
       // Called when the "Remove Event" button is clicked the scheduler
@@ -269,6 +272,9 @@
         } else {
           echo 'Failed to remove event from ' . $day . ' :(<br>';
         }
+
+        // update what will be displayed to app users
+        updateTodaysSelection($id, getTodaysDay() );
       }
 
       // Called when the "Remove Special" button is clicked in the scheduler
@@ -279,6 +285,9 @@
                   $did . ';';
         $result = $db->query($query);
         if ($result == TRUE) {
+          // update what will be displayed to app users
+          updateTodaysSelection($id, getTodaysDay() );
+          
           echo 'Successfully removed drink '. $did . ' from special!<br>';
         } else {
           echo 'Failed to remove drink from this special :(<br>';
