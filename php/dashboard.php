@@ -86,6 +86,10 @@
                   $id . '\', \'0\');';
         $result = $db->query($query);
         if ($result === TRUE){
+
+          // update what will be displayed to app users
+          updateTodaysSelection($id, getTodaysDay() );
+
           if ($TRACE){
             echo "TRACE: Tried query:$query<br>\tsuccessfully inserted drink!, return value: $result!<br>";
           }
@@ -113,6 +117,9 @@
                   mysqli_real_escape_string($db, $desc) . '\', 0);';
         $result = $db->query($query);
         if ($result === TRUE){
+          // update what will be displayed to app users
+          updateTodaysSelection($id, getTodaysDay() );
+
           if ($TRACE){
             echo "TRACE: Tried query:$query<br>\tsuccessfully inserted event!, return value: $result!<br>";
           }
@@ -137,6 +144,10 @@
                     $did . '\';';
         $result = $db->query($query);
         if ($result === TRUE){
+          // update what will be displayed to app users
+          updateTodaysSelection($id, getTodaysDay() );
+
+
           if ($TRACE){
             echo "TRACE: Tried query:$query<br>\tsuccessfully deleted drink!, return value: $result!<br>";
           }
@@ -165,6 +176,10 @@
         $query = 'DELETE FROM event WHERE id=\'' . $eid . '\';';
         $result = $db->query($query);
         if ($result === TRUE){
+
+          // update what will be displayed to app users
+          updateTodaysSelection($id, getTodaysDay() );
+          
           if ($TRACE){
             echo "TRACE: Tried query:$query<br>\tsuccessfully deleted event!, return value: $result!<br>";
           }
